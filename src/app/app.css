@@ -1,0 +1,181 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+
+:root {
+  /* Brand Colors */
+  --qt-orange: #E86A2D;
+  --qt-navy: #0D1B2A;
+  --qt-navy-light: #1b2f47;
+  
+  /* Status Colors */
+  --qt-success: #28a745;
+  --qt-danger: #dc3545;
+  --qt-warning: #ffc107;
+  --qt-info: #17a2b8;
+
+  /* Backgrounds & Text */
+  --qt-bg-primary: #ffffff;
+  --qt-bg-secondary: #f8f9fa;
+  --qt-bg-tertiary: #e9ecef;
+  
+  --qt-text-main: #212529;
+  --qt-text-muted: #6c757d;
+  --qt-text-light: #f8f9fa;
+
+  /* Typography */
+  --font-family-base: 'Inter', sans-serif;
+  
+  /* Shadows */
+  --box-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --box-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --box-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+  
+  /* Borders */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-color: #dee2e6;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family-base);
+  color: var(--qt-text-main);
+  background-color: var(--qt-bg-secondary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: var(--qt-navy);
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+a {
+  color: var(--qt-orange);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #d1561f;
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  font-family: var(--font-family-base);
+  font-weight: 500;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: var(--border-radius-md);
+  border: 1px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: var(--qt-orange);
+  border-color: var(--qt-orange);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #d1561f;
+  border-color: #c7511c;
+}
+
+.btn-secondary {
+  color: #fff;
+  background-color: var(--qt-navy);
+  border-color: var(--qt-navy);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--qt-navy-light);
+  border-color: var(--qt-navy-light);
+}
+
+.btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--qt-navy);
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-family: var(--font-family-base);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--qt-text-main);
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+  color: var(--qt-text-main);
+  background-color: #fff;
+  border-color: var(--qt-orange);
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(232, 106, 45, 0.25);
+}
+
+/* Cards */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--box-shadow-sm);
+}
+
+.card-body {
+  flex: 1 1 auto;
+  padding: 1.5rem;
+}
+
+/* Utilities */
+.text-center { text-align: center; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 1rem; }
+.mt-4 { margin-top: 1.5rem; }
+.mt-5 { margin-top: 3rem; }
+.mb-2 { margin-bottom: 0.5rem; }
+.mb-3 { margin-bottom: 1rem; }
+.mb-4 { margin-bottom: 1.5rem; }
+.mb-5 { margin-bottom: 3rem; }
+.text-danger { color: var(--qt-danger); }
+.text-success { color: var(--qt-success); }
+.text-muted { color: var(--qt-text-muted); }
