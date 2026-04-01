@@ -102,8 +102,8 @@ export class AdminOrdersComponent implements OnInit {
 
   loadOrders() {
     this.isLoading = true;
-    this.adminService.getAllOrders().subscribe({
-      next: (res) => {
+    this.adminService.getOrders().subscribe({
+      next: (res: any) => {
         this.isLoading = false;
         this.orders = res.data.content || res.data;
       },

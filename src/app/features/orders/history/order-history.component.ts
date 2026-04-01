@@ -93,8 +93,8 @@ export class OrderHistoryComponent implements OnInit {
 
   ngOnInit() {
     this.isLoading = true;
-    this.orderService.getUserOrders().subscribe({
-      next: (res) => {
+    this.orderService.listForUser().subscribe({
+      next: (res: any) => {
         this.isLoading = false;
         this.orders = res.data.content || res.data; 
       },

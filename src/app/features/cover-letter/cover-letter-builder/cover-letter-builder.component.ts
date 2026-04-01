@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { CoverLetterService } from '../../../core/services/cover-letter.service';
 import { ToastService } from '../../../shared/services/toast.service';
@@ -9,7 +9,7 @@ import { SpinnerComponent } from '../../../shared/components/spinner/spinner.com
 @Component({
   selector: 'app-cover-letter-builder',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, SpinnerComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, SpinnerComponent],
   template: `
     <div class="bg-secondary min-vh-100 py-5">
       <app-spinner [show]="isLoading"></app-spinner>
@@ -52,7 +52,7 @@ import { SpinnerComponent } from '../../../shared/components/spinner/spinner.com
           <div *ngIf="generatedContent">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <h4>Generated Cover Letter</h4>
-              <button class="btn btn-sm btn-outline-secondary" (click)="save()">Save Draft</button>
+              <button class="btn btn-sm btn-outline-secondary" (click)="save()">Done</button>
             </div>
             
             <textarea class="form-control mb-3" rows="15" [(ngModel)]="generatedContent"></textarea>
@@ -99,11 +99,11 @@ export class CoverLetterBuilderComponent {
     if (this.clForm.invalid) return;
     this.isLoading = true;
     
-    this.clService.generateCoverLetter(this.clForm.value).subscribe({
-      next: (res) => {
+    this.clService.create(this.clForm.value).subscribe({
+      next: (res: any) => {
         this.isLoading = false;
-        this.generatedContent = res.data.content;
-        this.toast.success('Cover letter generated!');
+        this.generatedContent = res.data.content || '';
+        this.toast.success('Cover letter generated and saved!');
       },
       error: () => {
         this.isLoading = false;
@@ -114,22 +114,6 @@ export class CoverLetterBuilderComponent {
 
   save() {
     if (!this.generatedContent) return;
-    this.isLoading = true;
-    const body = {
-      ...this.clForm.value,
-      content: this.generatedContent
-    };
-    
-    this.clService.createCoverLetter(body).subscribe({
-      next: () => {
-        this.isLoading = false;
-        this.toast.success('Cover letter saved successfully!');
-        this.router.navigate(['/cover-letters/list']);
-      },
-      error: () => {
-        this.isLoading = false;
-        this.toast.error('Failed to save cover letter.');
-      }
-    });
+    this.router.navigate(['/cover-letters/list']);
   }
 }

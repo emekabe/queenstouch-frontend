@@ -99,15 +99,24 @@ export class RequestFormComponent {
     // so we'll just mock it.
     
     const dto = {
-      orderId: this.requestForm.value.orderId,
-      notes: this.requestForm.value.notes
+      serviceType: this.requestForm.value.orderId!,
+      notes: this.requestForm.value.notes || undefined
     };
     
-    this.premiumReqService.submitRequest(dto, this.selectedFile).subscribe({
-      next: () => {
-        this.isLoading = false;
-        this.toast.success('Premium request submitted successfully! An expert will review it soon.');
-        this.router.navigate(['/premium/requests']);
+    this.premiumReqService.create(dto).subscribe({
+      next: (res: any) => {
+        const id = res.data.id;
+        this.premiumReqService.uploadFile(id, this.selectedFile!).subscribe({
+          next: () => {
+            this.isLoading = false;
+            this.toast.success('Premium request submitted successfully! An expert will review it soon.');
+            this.router.navigate(['/premium/requests']);
+          },
+          error: () => {
+            this.isLoading = false;
+            this.toast.error('Failed to upload file. Request created but incomplete.');
+          }
+        });
       },
       error: () => {
         this.isLoading = false;

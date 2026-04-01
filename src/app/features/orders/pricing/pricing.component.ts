@@ -67,14 +67,17 @@ export class PricingComponent implements OnInit {
 
   ngOnInit() {
     this.orderService.getPricingCatalogue().subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.isLoading = false;
-        // The endpoint returns an object like { "STANDARD_CV_DOWNLOAD": 2500, ... }
-        // We transform it into an array for the view
-        this.pricingList = Object.keys(res).map(key => ({
-          serviceType: key,
-          price: res[key]
-        }));
+        const data = res.data || res;
+        if (Array.isArray(data)) {
+          this.pricingList = data;
+        } else {
+          this.pricingList = Object.keys(data).map(key => ({
+            serviceType: key,
+            price: data[key]
+          }));
+        }
       },
       error: () => {
         this.isLoading = false;
@@ -85,7 +88,7 @@ export class PricingComponent implements OnInit {
 
   placeOrder(item: any) {
     this.isLoading = true;
-    this.orderService.createOrder({ serviceType: item.serviceType, referenceId: '' }).subscribe({
+    this.orderService.createOrder({ serviceKey: item.serviceType }).subscribe({
       next: () => {
         this.isLoading = false;
         // In our mock backend, order is immediately marked as PAID

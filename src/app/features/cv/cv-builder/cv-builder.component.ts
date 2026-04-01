@@ -353,8 +353,9 @@ export class CvBuilderComponent implements OnInit {
   loadCv() {
     if (!this.cvId) return;
     this.isLoading = true;
-    this.cvService.getCv(this.cvId).subscribe({
-      next: (cv) => {
+    this.cvService.getById(this.cvId).subscribe({
+      next: (res: any) => {
+        const cv = res.data;
         this.isLoading = false;
         // Patch form
         if (cv.personalInfo) {
@@ -419,11 +420,11 @@ export class CvBuilderComponent implements OnInit {
     // For now we map 1:1 since keys mostly match
     
     const obs$ = this.cvId 
-      ? this.cvService.updateCvSection(this.cvId, 'personalInfo', data.personalInfo)
-      : this.cvService.createCvDraft({ ...data.personalInfo, professionalSummary: data.professionalSummary });
+      ? this.cvService.updateSection(this.cvId, 'personalInfo', data.personalInfo)
+      : this.cvService.create({ ...data.personalInfo, professionalSummary: data.professionalSummary });
       
     obs$.subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.isLoading = false;
         if (!this.cvId) {
           this.cvId = res.data.id;
@@ -432,8 +433,8 @@ export class CvBuilderComponent implements OnInit {
         
         // If continuing, also update other sections that are present
         if (this.cvId && this.currentStep > 1) {
-             this.cvService.updateCvSection(this.cvId, 'experience', data.experience).subscribe();
-             this.cvService.updateCvSection(this.cvId, 'summary', { summary: data.professionalSummary }).subscribe();
+             this.cvService.updateSection(this.cvId, 'experience', data.experience).subscribe();
+             this.cvService.updateSection(this.cvId, 'summary', { summary: data.professionalSummary }).subscribe();
         }
 
         this.toast.success('CV draft saved successfully.');
@@ -454,9 +455,14 @@ export class CvBuilderComponent implements OnInit {
       return;
     }
 
+    if (!this.cvId) {
+      this.toast.error('Please save the draft to get a CV ID first.');
+      return;
+    }
+
     this.isLoading = true;
-    this.cvService.generateSummary({ jobTitle, currentSummary }).subscribe({
-      next: (res) => {
+    this.cvService.generateSummary(this.cvId, { jobTitle, currentSummary }).subscribe({
+      next: (res: any) => {
         this.isLoading = false;
         this.cvForm.get('professionalSummary')?.setValue(res.data.summary);
         this.toast.success('Summary generated via AI.');
@@ -476,11 +482,11 @@ export class CvBuilderComponent implements OnInit {
     }
     
     this.isLoading = true;
-    this.cvService.buildAchievement({ 
+    this.cvService.generateAchievement({ 
       originalTask: control.value,
       jobTitle: this.experienceArray.at(index).get('jobTitle')?.value || ''
     }).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.isLoading = false;
         control.setValue(res.data.achievement);
         this.toast.success('Achievement improved via AI.');
@@ -499,9 +505,9 @@ export class CvBuilderComponent implements OnInit {
     }
     this.isLoading = true;
     this.cvService.scoreCv(this.cvId).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.isLoading = false;
-        this.cvScore = res.data.score;
+        this.cvScore = res.data.score || res.data;
         this.toast.success('CV successfully analyzed!');
       },
       error: () => {

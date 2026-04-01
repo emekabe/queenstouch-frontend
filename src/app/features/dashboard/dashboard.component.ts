@@ -140,8 +140,8 @@ export class DashboardComponent implements OnInit {
   user: User | null = null;
 
   ngOnInit() {
-    this.authService.getCurrentUser().subscribe(user => {
-      this.user = user;
+    this.authService.currentUser$.subscribe(user => {
+      this.user = user as User;
     });
   }
 

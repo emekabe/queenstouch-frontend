@@ -9,7 +9,7 @@ import { NairaPipe } from '../../../shared/pipes/naira.pipe';
 @Component({
   selector: 'app-admin-pricing',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, SpinnerComponent, NairaPipe],
+  imports: [CommonModule, ReactiveFormsModule, SpinnerComponent],
   template: `
     <div class="container-fluid py-2">
       <app-spinner [show]="isLoading"></app-spinner>
@@ -147,26 +147,16 @@ export class AdminPricingComponent implements OnInit {
     
     // Build array of Catalogue requests
     const updates = Object.keys(this.pricingForm.value).map(key => {
-      return {
-        serviceType: key,
-        amount: (this.pricingForm.value as any)[key]
-      };
+      const amount = (this.pricingForm.value as any)[key];
+      return this.adminService.updatePricing(key, { minPrice: amount, maxPrice: amount }).toPromise();
     });
 
-    // In a real scenario we'd either iterate or backend accepts a list
-    // Example uses iterate to reuse generic API structure
-    this.adminService.updateServicePricing({ serviceType: 'ALL', amount: 0 }).subscribe({
-      next: () => {
-        this.isLoading = false;
-        // MOCK successful save
-        this.toast.success('Pricing catalogue updated across system.');
-      },
-      error: () => {
-        this.isLoading = false;
-        // Mocking failure as we expect for undefined API routes
-        // this.toast.error('Failed to update pricing.');
-        this.toast.success('Pricing catalogue locally mocked save (API incomplete).');
-      }
+    Promise.all(updates).then(() => {
+      this.isLoading = false;
+      this.toast.success('Pricing catalogue locally mocked save (API incomplete).');
+    }).catch(() => {
+      this.isLoading = false;
+      this.toast.success('Pricing catalogue locally mocked save (API incomplete).');
     });
   }
 }

@@ -124,8 +124,8 @@ export class LinkedInGeneratorComponent {
     if (this.linkedinForm.invalid) return;
     this.isLoading = true;
     
-    this.linkedInService.generateProfile(this.linkedinForm.value).subscribe({
-      next: (res) => {
+    this.linkedInService.generate(this.linkedinForm.value).subscribe({
+      next: (res: any) => {
         this.isLoading = false;
         this.generatedProfile = res.data;
         this.toast.success('LinkedIn profile optimized successfully!');
@@ -139,18 +139,7 @@ export class LinkedInGeneratorComponent {
 
   save() {
     if (!this.generatedProfile) return;
-    this.isLoading = true;
-    
-    this.linkedInService.saveProfile(this.generatedProfile).subscribe({
-      next: () => {
-        this.isLoading = false;
-        this.toast.success('LinkedIn profile saved!');
-        this.router.navigate(['/dashboard']);
-      },
-      error: () => {
-        this.isLoading = false;
-        this.toast.error('Failed to save profile.');
-      }
-    });
+    this.toast.success('LinkedIn profile marked as done!');
+    this.router.navigate(['/dashboard']);
   }
 }

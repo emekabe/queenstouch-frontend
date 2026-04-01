@@ -187,5 +187,5 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class LandingComponent {
   authService = inject(AuthService);
-  isLoggedIn = this.authService.hasToken(); // simple check for initial render
+  isLoggedIn = !!this.authService.getAccessToken(); // simple check for initial render
 }

@@ -46,11 +46,6 @@ import { SpinnerComponent } from '../../../shared/components/spinner/spinner.com
               </td>
               <td class="text-right">
                 <button class="btn btn-sm btn-outline-secondary me-2">Edit</button>
-                <button class="btn btn-sm" 
-                  [ngClass]="user.enabled ? 'btn-outline-danger' : 'btn-outline-success'"
-                  (click)="toggleUserStatus(user)">
-                  {{ user.enabled ? 'Disable' : 'Enable' }}
-                </button>
               </td>
             </tr>
             <tr *ngIf="users.length === 0 && !isLoading">
@@ -123,8 +118,8 @@ export class AdminUsersComponent implements OnInit {
 
   loadUsers() {
     this.isLoading = true;
-    this.adminService.getAllUsers().subscribe({
-      next: (res) => {
+    this.adminService.getUsers().subscribe({
+      next: (res: any) => {
         this.isLoading = false;
         // The backend returns PageResponse<UserDTO>
         this.users = res.data.content || res.data;
@@ -136,20 +131,5 @@ export class AdminUsersComponent implements OnInit {
     });
   }
 
-  toggleUserStatus(user: any) {
-    this.isLoading = true;
-    const action = user.enabled ? this.adminService.disableUser(user.id) : this.adminService.enableUser(user.id);
-    
-    action.subscribe({
-      next: () => {
-        this.isLoading = false;
-        this.toast.success(`User ${user.enabled ? 'disabled' : 'enabled'} successfully.`);
-        this.loadUsers();
-      },
-      error: () => {
-        this.isLoading = false;
-        this.toast.error('Failed to update user status.');
-      }
-    });
-  }
+
 }

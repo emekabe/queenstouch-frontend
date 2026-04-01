@@ -105,7 +105,7 @@ export class LoginComponent {
       next: (res) => {
         this.isLoading = false;
         this.toast.success('Logged in successfully!');
-        if (res.data?.role === 'ADMIN') {
+        if ((res.data?.user?.roles as any[])?.includes('ADMIN')) {
           this.router.navigate(['/admin/dashboard']);
         } else {
           this.router.navigate(['/dashboard']);

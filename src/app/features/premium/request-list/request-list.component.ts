@@ -101,8 +101,8 @@ export class RequestListComponent implements OnInit {
 
   ngOnInit() {
     this.isLoading = true;
-    this.reqService.getUserRequests().subscribe({
-      next: (res) => {
+    this.reqService.listForUser().subscribe({
+      next: (res: any) => {
         this.isLoading = false;
         this.requests = res.data.content || res.data; 
       },

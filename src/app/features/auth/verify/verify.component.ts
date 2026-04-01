@@ -119,6 +119,6 @@ export class VerifyComponent implements OnInit {
     }
     // In a real app we'd have a resend-code API endpoint. Using forgot-password to trigger code resend if it works, 
     // or just inform the user.
-    this.toast.info('Code resend functionality will be implemented soon.');
+    this.toast.success('Code resend functionality will be implemented soon.');
   }
 }

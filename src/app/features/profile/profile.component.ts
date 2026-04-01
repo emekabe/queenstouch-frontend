@@ -88,13 +88,14 @@ export class ProfileComponent implements OnInit {
 
   loadProfile() {
     this.isLoading = true;
-    this.userService.getCurrentUser().subscribe({
-      next: (res) => {
+    this.userService.getProfile().subscribe({
+      next: (res: any) => {
         this.isLoading = false;
         this.currentUser = res.data;
+        const nameParts = (this.currentUser.name || '').split(' ');
         this.profileForm.patchValue({
-          firstName: this.currentUser.firstName,
-          lastName: this.currentUser.lastName
+          firstName: nameParts[0] || '',
+          lastName: nameParts.slice(1).join(' ') || ''
         });
       },
       error: () => {
@@ -107,7 +108,8 @@ export class ProfileComponent implements OnInit {
   saveProfile() {
     if (this.profileForm.invalid) return;
     this.isLoading = true;
-    this.userService.updateProfile(this.profileForm.value).subscribe({
+    const name = `${this.profileForm.value.firstName} ${this.profileForm.value.lastName}`;
+    this.userService.updateProfile({ name }).subscribe({
       next: () => {
         this.isLoading = false;
         this.toast.success('Profile updated successfully!');
