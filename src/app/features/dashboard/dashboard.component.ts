@@ -1,7 +1,11 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
+import { ChangeDetectorRef } from '@angular/core';
 import { AuthService } from '../../core/services/auth.service';
+import { CvService } from '../../core/services/cv.service';
+import { CoverLetterService } from '../../core/services/cover-letter.service';
+import { OrderService } from '../../core/services/order.service';
 import { User } from '../../core/models/user.model';
 import { LogoComponent } from '../../shared/components/logo/logo.component';
 
@@ -15,7 +19,7 @@ import { LogoComponent } from '../../shared/components/logo/logo.component';
       <div class="container d-flex justify-content-between align-items-center py-3">
         <app-logo [height]="36"></app-logo>
         <div class="user-menu d-flex align-items-center gap-3">
-          <span class="user-greeting">Hi, {{ user?.name?.split(' ')?.[0] || 'User' }}</span>
+          <span class="user-greeting">Hi, {{ user?.firstName || 'User' }}</span>
           <button (click)="logout()" class="btn btn-outline-danger btn-sm text-danger" style="background: none; border: 1px solid var(--qt-danger);">Logout</button>
         </div>
       </div>
@@ -32,16 +36,18 @@ import { LogoComponent } from '../../shared/components/logo/logo.component';
         <div class="stats-grid mb-5">
           <div class="card hover-card stat-card border-none shadow-sm p-4">
             <h5 class="text-muted">Saved CVs</h5>
-            <h2 class="mt-2 text-navy">0</h2>
-            <a routerLink="/cv/list" class="stretched-link d-none">View All</a>
+            <h2 class="mt-2 text-navy">{{ cvCount }}</h2>
+            <a routerLink="/cv/list" class="stretched-link">View All</a>
           </div>
           <div class="card hover-card stat-card border-none shadow-sm p-4">
             <h5 class="text-muted">Cover Letters</h5>
-            <h2 class="mt-2 text-navy">0</h2>
+            <h2 class="mt-2 text-navy">{{ clCount }}</h2>
+            <a routerLink="/cover-letters/list" class="stretched-link">View All</a>
           </div>
           <div class="card hover-card stat-card border-none shadow-sm p-4">
             <h5 class="text-muted">Premium Orders</h5>
-            <h2 class="mt-2 text-navy">0</h2>
+            <h2 class="mt-2 text-navy">{{ orderCount }}</h2>
+            <a routerLink="/orders/history" class="stretched-link">View All</a>
           </div>
         </div>
 
@@ -136,12 +142,36 @@ import { LogoComponent } from '../../shared/components/logo/logo.component';
 })
 export class DashboardComponent implements OnInit {
   authService = inject(AuthService);
+  cvService = inject(CvService);
+  clService = inject(CoverLetterService);
+  orderService = inject(OrderService);
   router = inject(Router);
+  cdr = inject(ChangeDetectorRef);
+
   user: User | null = null;
+  cvCount = 0;
+  clCount = 0;
+  orderCount = 0;
 
   ngOnInit() {
     this.authService.currentUser$.subscribe(user => {
       this.user = user as User;
+    });
+    this.loadStats();
+  }
+
+  loadStats() {
+    this.cvService.list().subscribe(res => {
+      if (res.success && res.data) this.cvCount = res.data.length;
+      this.cdr.detectChanges();
+    });
+    this.clService.list().subscribe(res => {
+      if (res.success && res.data) this.clCount = res.data.length;
+      this.cdr.detectChanges();
+    });
+    this.orderService.listForUser().subscribe(res => {
+      if (res.success && res.data) this.orderCount = res.data.length;
+      this.cdr.detectChanges();
     });
   }
 

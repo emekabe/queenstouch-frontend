@@ -98,11 +98,22 @@ export class CoverLetterBuilderComponent {
   generate() {
     if (this.clForm.invalid) return;
     this.isLoading = true;
-    
-    this.clService.create(this.clForm.value).subscribe({
+    const v = this.clForm.value;
+    const combinedExp = [v.jobDescription, v.userExperience]
+      .filter(x => !!x?.trim())
+      .join('\n\n') || 'General application';
+
+    const payload = {
+      jobTitle: v.jobTitle,
+      companyName: v.companyName,
+      relevantExperience: combinedExp,
+      keySkills: []
+    };
+
+    this.clService.create(payload).subscribe({
       next: (res: any) => {
         this.isLoading = false;
-        this.generatedContent = res.data.content || '';
+        this.generatedContent = res.data.generatedContent || '';
         this.toast.success('Cover letter generated and saved!');
       },
       error: () => {

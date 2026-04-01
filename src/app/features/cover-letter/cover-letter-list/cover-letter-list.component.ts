@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { CoverLetterService } from '../../../core/services/cover-letter.service';
@@ -82,6 +82,7 @@ export class CoverLetterListComponent implements OnInit {
   orderService = inject(OrderService);
   toast = inject(ToastService);
   router = inject(Router);
+  cdr = inject(ChangeDetectorRef);
   
   coverLetters: any[] = [];
   isLoading = false;
@@ -92,13 +93,16 @@ export class CoverLetterListComponent implements OnInit {
 
   loadCoverLetters() {
     this.isLoading = true;
+    this.cdr.detectChanges();
     this.clService.list().subscribe({
       next: (res) => {
         this.isLoading = false;
-        this.coverLetters = res.data;
+        this.coverLetters = res.data || [];
+        this.cdr.detectChanges();
       },
       error: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         this.toast.error('Failed to load cover letters.');
       }
     });

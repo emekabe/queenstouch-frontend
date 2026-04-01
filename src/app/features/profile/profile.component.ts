@@ -34,6 +34,11 @@ import { SpinnerComponent } from '../../shared/components/spinner/spinner.compon
               <input type="email" class="form-control" [value]="currentUser?.email" disabled>
             </div>
             
+            <div class="form-group mb-3">
+              <label class="form-label">Phone Number</label>
+              <input type="tel" class="form-control" formControlName="phone">
+            </div>
+            
             <div class="d-flex justify-content-end">
               <button type="submit" class="btn btn-primary" [disabled]="profileForm.invalid || isLoading">
                 Save Changes
@@ -79,7 +84,8 @@ export class ProfileComponent implements OnInit {
 
   profileForm = this.fb.group({
     firstName: ['', Validators.required],
-    lastName: ['', Validators.required]
+    lastName: ['', Validators.required],
+    phone: ['']
   });
 
   ngOnInit() {
@@ -92,10 +98,11 @@ export class ProfileComponent implements OnInit {
       next: (res: any) => {
         this.isLoading = false;
         this.currentUser = res.data;
-        const nameParts = (this.currentUser.name || '').split(' ');
+        this.currentUser = res.data;
         this.profileForm.patchValue({
-          firstName: nameParts[0] || '',
-          lastName: nameParts.slice(1).join(' ') || ''
+          firstName: this.currentUser.firstName || '',
+          lastName: this.currentUser.lastName || '',
+          phone: this.currentUser.phone || ''
         });
       },
       error: () => {
@@ -108,8 +115,11 @@ export class ProfileComponent implements OnInit {
   saveProfile() {
     if (this.profileForm.invalid) return;
     this.isLoading = true;
-    const name = `${this.profileForm.value.firstName} ${this.profileForm.value.lastName}`;
-    this.userService.updateProfile({ name }).subscribe({
+    this.userService.updateProfile({ 
+      firstName: this.profileForm.value.firstName || undefined,
+      lastName: this.profileForm.value.lastName || undefined,
+      phone: this.profileForm.value.phone || undefined 
+    }).subscribe({
       next: () => {
         this.isLoading = false;
         this.toast.success('Profile updated successfully!');

@@ -1,25 +1,27 @@
 export enum Role {
-  USER = 'ROLE_USER',
-  ADMIN = 'ROLE_ADMIN'
+  USER = 'USER',
+  ADMIN = 'ADMIN'
 }
 
 export interface UserResponse {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  phoneNumber?: string;
+  phone?: string;
   emailVerified: boolean;
-  roles: Role[];
+  role: Role;
   createdAt: string;
 }
 
 export interface User {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  phoneNumber?: string;
+  phone?: string;
   password?: string;
   emailVerified: boolean;
-  roles: Role[];
+  role: Role;
   createdAt: string;
 }

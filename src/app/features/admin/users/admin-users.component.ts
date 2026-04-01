@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminService } from '../../../core/services/admin.service';
 import { ToastService } from '../../../shared/services/toast.service';
@@ -108,6 +108,7 @@ import { SpinnerComponent } from '../../../shared/components/spinner/spinner.com
 export class AdminUsersComponent implements OnInit {
   adminService = inject(AdminService);
   toast = inject(ToastService);
+  cdr = inject(ChangeDetectorRef);
   
   users: any[] = [];
   isLoading = false;
@@ -118,14 +119,16 @@ export class AdminUsersComponent implements OnInit {
 
   loadUsers() {
     this.isLoading = true;
+    this.cdr.detectChanges();
     this.adminService.getUsers().subscribe({
       next: (res: any) => {
         this.isLoading = false;
-        // The backend returns PageResponse<UserDTO>
-        this.users = res.data.content || res.data;
+        this.users = res.data.content || res.data || [];
+        this.cdr.detectChanges();
       },
       error: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         this.toast.error('Failed to load users.');
       }
     });

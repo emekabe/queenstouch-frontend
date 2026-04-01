@@ -134,11 +134,21 @@ export class AdminPricingComponent implements OnInit {
 
   ngOnInit() {
     this.isLoading = true;
-    // We fetch the current catalogue from the order service but admin uses the same shape
-    // Assuming adminService has a corresponding GET method if there isn't one we skip or adapt
-    // For this prototype, the default values seeded by formBuilder above simulate that state.
-    // In real app, we'd GET from backend first.
-    this.isLoading = false;
+    this.adminService.getAllPricing().subscribe({
+      next: (res: any) => {
+        const prices = res.data;
+        const patchData: any = {};
+        if (Array.isArray(prices)) {
+           prices.forEach(p => patchData[p.serviceKey] = p.minPrice);
+        }
+        this.pricingForm.patchValue(patchData);
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+        this.toast.error('Failed to load pricing');
+      }
+    });
   }
 
   savePricing() {
@@ -148,15 +158,19 @@ export class AdminPricingComponent implements OnInit {
     // Build array of Catalogue requests
     const updates = Object.keys(this.pricingForm.value).map(key => {
       const amount = (this.pricingForm.value as any)[key];
-      return this.adminService.updatePricing(key, { minPrice: amount, maxPrice: amount }).toPromise();
+      // Only fire request if amount is valid
+      if (amount !== null && amount !== undefined) {
+         return this.adminService.updatePricing(key, { minPrice: amount, maxPrice: amount }).toPromise();
+      }
+      return Promise.resolve();
     });
 
     Promise.all(updates).then(() => {
       this.isLoading = false;
-      this.toast.success('Pricing catalogue locally mocked save (API incomplete).');
+      this.toast.success('Pricing catalogue updated successfully.');
     }).catch(() => {
       this.isLoading = false;
-      this.toast.success('Pricing catalogue locally mocked save (API incomplete).');
+      this.toast.error('Some updates may have failed.');
     });
   }
 }

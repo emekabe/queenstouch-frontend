@@ -119,9 +119,18 @@ import { ScoreRingComponent } from '../../../shared/components/score-ring/score-
                           <label class="form-label">Start Date</label>
                           <input type="month" class="form-control" formControlName="startDate">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" style="grid-column: span 2;">
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" formControlName="currentJob" [id]="'currentJob' + i">
+                            <label class="form-check-label" [for]="'currentJob' + i">I currently work here</label>
+                          </div>
+                        </div>
+                        <div class="form-group" *ngIf="!exp.get('currentJob')?.value">
                           <label class="form-label">End Date</label>
                           <input type="month" class="form-control" formControlName="endDate">
+                        </div>
+                        <div class="form-group" *ngIf="exp.get('currentJob')?.value">
+                          <label class="form-label text-muted d-block pt-4">Present</label>
                         </div>
                         <div class="form-group" style="grid-column: span 2;">
                           <div class="d-flex justify-content-between align-items-center mb-2">
@@ -138,11 +147,90 @@ import { ScoreRingComponent } from '../../../shared/components/score-ring/score-
                   <button type="button" class="btn btn-outline-secondary w-100" (click)="addExperience()">+ Add Experience</button>
                 </div>
 
-                <!-- Step 4, 5, 6, 7 Implementation follows similar pattern -->
-                <div *ngIf="currentStep >= 4 && currentStep <= 6" class="step-content text-center py-5">
-                  <div class="text-muted mb-3 icon-lg">🚧</div>
-                  <h4>[Step {{ currentStep }} Placeholder]</h4>
-                  <p class="text-muted">Education, Skills, and Projects will be fully implemented soon.</p>
+                <!-- STEP 4: Education -->
+                <div *ngIf="currentStep === 4" class="step-content">
+                  <p class="text-muted mb-4">List your academic background.</p>
+                  <div formArrayName="education" *ngFor="let edu of educationArray.controls; let i=index" class="mb-4 p-3 border rounded">
+                    <div [formGroupName]="i">
+                      <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="m-0">Education #{{ i + 1 }}</h5>
+                        <button type="button" class="btn btn-sm text-danger" (click)="removeEducation(i)">&times; Remove</button>
+                      </div>
+                      <div class="grid-2">
+                        <div class="form-group">
+                          <label class="form-label">Degree</label>
+                          <input type="text" class="form-control" formControlName="degree">
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">Field of Study</label>
+                          <input type="text" class="form-control" formControlName="fieldOfStudy">
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                          <label class="form-label">Institution</label>
+                          <input type="text" class="form-control" formControlName="institution">
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">Start Date</label>
+                          <input type="month" class="form-control" formControlName="startDate">
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">End Date</label>
+                          <input type="month" class="form-control" formControlName="endDate">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-outline-secondary w-100" (click)="addEducation()">+ Add Education</button>
+                </div>
+
+                <!-- STEP 5: Skills -->
+                <div *ngIf="currentStep === 5" class="step-content">
+                  <p class="text-muted mb-4">Add your technical and soft skills.</p>
+                  <div formArrayName="skills">
+                    <div *ngFor="let skill of skillsArray.controls; let i=index" class="d-flex mb-3" [formGroupName]="i">
+                      <div class="flex-grow-1 form-group m-0 me-2">
+                        <input type="text" class="form-control" formControlName="name" placeholder="Skill Name, e.g. React.js">
+                      </div>
+                      <div class="form-group m-0" style="width: 150px;">
+                        <select class="form-control" formControlName="level">
+                          <option value="BEGINNER">Beginner</option>
+                          <option value="INTERMEDIATE">Intermediate</option>
+                          <option value="ADVANCED">Advanced</option>
+                          <option value="EXPERT">Expert</option>
+                        </select>
+                      </div>
+                      <button type="button" class="btn btn-outline-danger ms-2" (click)="removeSkill(i)">&times;</button>
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-outline-secondary w-100 mt-2" (click)="addSkill()">+ Add Skill</button>
+                </div>
+
+                <!-- STEP 6: Projects -->
+                <div *ngIf="currentStep === 6" class="step-content">
+                  <p class="text-muted mb-4">Highlight key projects if you have them.</p>
+                  <div formArrayName="projects" *ngFor="let proj of projectsArray.controls; let i=index" class="mb-4 p-3 border rounded">
+                    <div [formGroupName]="i">
+                      <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="m-0">Project #{{ i + 1 }}</h5>
+                        <button type="button" class="btn btn-sm text-danger" (click)="removeProject(i)">&times; Remove</button>
+                      </div>
+                      <div class="grid-2">
+                        <div class="form-group">
+                          <label class="form-label">Title</label>
+                          <input type="text" class="form-control" formControlName="title">
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">Link (optional)</label>
+                          <input type="url" class="form-control" formControlName="link">
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                          <label class="form-label">Description</label>
+                          <textarea class="form-control" formControlName="description" rows="3"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-outline-secondary w-100" (click)="addProject()">+ Add Project</button>
                 </div>
 
                 <div *ngIf="currentStep === 7" class="step-content text-center">
@@ -331,11 +419,26 @@ export class CvBuilderComponent implements OnInit {
       targetJobTitle: ['']
     }),
     professionalSummary: [''],
-    experience: this.fb.array([])
+    experience: this.fb.array([]),
+    education: this.fb.array([]),
+    skills: this.fb.array([]),
+    projects: this.fb.array([])
   });
 
   get experienceArray() {
     return this.cvForm.get('experience') as FormArray;
+  }
+  
+  get educationArray() {
+    return this.cvForm.get('education') as FormArray;
+  }
+  
+  get skillsArray() {
+    return this.cvForm.get('skills') as FormArray;
+  }
+  
+  get projectsArray() {
+    return this.cvForm.get('projects') as FormArray;
   }
 
   ngOnInit() {
@@ -372,9 +475,42 @@ export class CvBuilderComponent implements OnInit {
               company: [e.company || ''],
               startDate: [e.startDate || ''],
               endDate: [e.endDate || ''],
+              currentJob: [e.currentJob || false],
               description: [e.description || '']
             });
             this.experienceArray.push(group);
+          });
+        }
+        if (cv.education && Array.isArray(cv.education)) {
+          this.educationArray.clear();
+          cv.education.forEach((e: any) => {
+            this.educationArray.push(this.fb.group({
+              institution: [e.institution || ''],
+              degree: [e.degree || ''],
+              fieldOfStudy: [e.fieldOfStudy || ''],
+              startDate: [e.startDate || ''],
+              endDate: [e.endDate || '']
+            }));
+          });
+        }
+        if (cv.skills && Array.isArray(cv.skills)) {
+          this.skillsArray.clear();
+          cv.skills.forEach((s: any) => {
+            this.skillsArray.push(this.fb.group({
+              name: [s.name || ''],
+              level: [s.level || 'INTERMEDIATE']
+            }));
+          });
+        }
+        // Projects aren't in standard CvModel, but stored in extra data if user uses CV Builder, but we handle it
+        if (cv.projects && Array.isArray(cv.projects)) {
+          this.projectsArray.clear();
+          cv.projects.forEach((p: any) => {
+            this.projectsArray.push(this.fb.group({
+              title: [p.title || ''],
+              link: [p.link || ''],
+              description: [p.description || '']
+            }));
           });
         }
       },
@@ -400,6 +536,43 @@ export class CvBuilderComponent implements OnInit {
     this.experienceArray.removeAt(index);
   }
 
+  addEducation() {
+    this.educationArray.push(this.fb.group({
+      institution: [''],
+      degree: [''],
+      fieldOfStudy: [''],
+      startDate: [''],
+      endDate: ['']
+    }));
+  }
+
+  removeEducation(index: number) {
+    this.educationArray.removeAt(index);
+  }
+
+  addSkill() {
+    this.skillsArray.push(this.fb.group({
+      name: [''],
+      level: ['INTERMEDIATE']
+    }));
+  }
+
+  removeSkill(index: number) {
+    this.skillsArray.removeAt(index);
+  }
+
+  addProject() {
+    this.projectsArray.push(this.fb.group({
+      title: [''],
+      link: [''],
+      description: ['']
+    }));
+  }
+
+  removeProject(index: number) {
+    this.projectsArray.removeAt(index);
+  }
+
   nextStep() {
     if (this.currentStep < this.totalSteps) {
       this.currentStep++;
@@ -412,16 +585,24 @@ export class CvBuilderComponent implements OnInit {
     }
   }
 
-  saveDraft() {
+  saveDraft(onSuccess?: () => void) {
     this.isLoading = true;
-    const data = this.cvForm.value;
+    const v = this.cvForm.value;
     
-    // Convert arrays back to proper domain structures before sending
-    // For now we map 1:1 since keys mostly match
-    
+    // 1. Map Personal Info
+    const personalInfoPayload = {
+      fullName: `${v.personalInfo.firstName} ${v.personalInfo.lastName}`.trim(),
+      email: v.personalInfo.email,
+      phone: v.personalInfo.phone,
+      linkedinUrl: v.personalInfo.linkedin,
+      portfolioUrl: v.personalInfo.portfolio,
+      title: v.personalInfo.targetJobTitle,
+      summary: v.professionalSummary
+    };
+
     const obs$ = this.cvId 
-      ? this.cvService.updateSection(this.cvId, 'personalInfo', data.personalInfo)
-      : this.cvService.create({ ...data.personalInfo, professionalSummary: data.professionalSummary });
+      ? this.cvService.updateSection(this.cvId, 'personal-info', personalInfoPayload)
+      : this.cvService.create(personalInfoPayload);
       
     obs$.subscribe({
       next: (res: any) => {
@@ -431,13 +612,46 @@ export class CvBuilderComponent implements OnInit {
           this.cvForm.get('id')?.setValue(this.cvId);
         }
         
-        // If continuing, also update other sections that are present
-        if (this.cvId && this.currentStep > 1) {
-             this.cvService.updateSection(this.cvId, 'experience', data.experience).subscribe();
-             this.cvService.updateSection(this.cvId, 'summary', { summary: data.professionalSummary }).subscribe();
+        // 2. Map other sections if they exist and we are beyond step 1
+        if (this.cvId) {
+          if (this.currentStep === 3) {
+            const workExperiences = v.experience.map((exp: any) => ({
+              jobTitle: exp.jobTitle,
+              company: exp.company,
+              startDate: exp.startDate,
+              endDate: exp.endDate,
+              current: exp.currentJob,
+              bullets: exp.description ? [exp.description] : []
+            }));
+            this.cvService.updateSection(this.cvId, 'experience', { workExperiences }).subscribe();
+          }
+
+          if (this.currentStep === 4) {
+            const educations = v.education.map((edu: any) => ({
+              institution: edu.institution,
+              degree: edu.degree,
+              fieldOfStudy: edu.fieldOfStudy,
+              startDate: edu.startDate,
+              endDate: edu.endDate
+            }));
+            this.cvService.updateSection(this.cvId, 'education', { educations }).subscribe();
+          }
+
+          if (this.currentStep === 5) {
+            const skills = v.skills.map((s: any) => ({
+              name: s.name,
+              level: s.level
+            }));
+            this.cvService.updateSection(this.cvId, 'skills', { skills }).subscribe();
+          }
         }
 
-        this.toast.success('CV draft saved successfully.');
+        if (onSuccess) {
+          this.toast.success('Auto-saved as draft before processing.');
+          onSuccess();
+        } else {
+          this.toast.success('CV draft saved successfully.');
+        }
       },
       error: () => {
         this.isLoading = false;
@@ -455,22 +669,19 @@ export class CvBuilderComponent implements OnInit {
       return;
     }
 
-    if (!this.cvId) {
-      this.toast.error('Please save the draft to get a CV ID first.');
-      return;
-    }
-
-    this.isLoading = true;
-    this.cvService.generateSummary(this.cvId, { jobTitle, currentSummary }).subscribe({
-      next: (res: any) => {
-        this.isLoading = false;
-        this.cvForm.get('professionalSummary')?.setValue(res.data.summary);
-        this.toast.success('Summary generated via AI.');
-      },
-      error: () => {
-        this.isLoading = false;
-        this.toast.error('Failed to generate summary.');
-      }
+    this.saveDraft(() => {
+      this.isLoading = true;
+      this.cvService.generateSummary(this.cvId!, { jobTitle, currentSummary }).subscribe({
+        next: (res: any) => {
+          this.isLoading = false;
+          this.cvForm.get('professionalSummary')?.setValue(res.data.summary);
+          this.toast.success('Summary generated via AI.');
+        },
+        error: () => {
+          this.isLoading = false;
+          this.toast.error('Failed to generate summary.');
+        }
+      });
     });
   }
 
@@ -488,7 +699,7 @@ export class CvBuilderComponent implements OnInit {
     }).subscribe({
       next: (res: any) => {
         this.isLoading = false;
-        control.setValue(res.data.achievement);
+        control.setValue(res.data.bullet);
         this.toast.success('Achievement improved via AI.');
       },
       error: () => {
@@ -499,21 +710,19 @@ export class CvBuilderComponent implements OnInit {
   }
 
   scoreCv() {
-    if (!this.cvId) {
-      this.toast.error('Please save your draft first before scoring.');
-      return;
-    }
-    this.isLoading = true;
-    this.cvService.scoreCv(this.cvId).subscribe({
-      next: (res: any) => {
-        this.isLoading = false;
-        this.cvScore = res.data.score || res.data;
-        this.toast.success('CV successfully analyzed!');
-      },
-      error: () => {
-        this.isLoading = false;
-        this.toast.error('Failed to score CV.');
-      }
+    this.saveDraft(() => {
+      this.isLoading = true;
+      this.cvService.scoreCv(this.cvId!).subscribe({
+        next: (res: any) => {
+          this.isLoading = false;
+          this.cvScore = res.data.score || res.data;
+          this.toast.success('CV successfully analyzed!');
+        },
+        error: () => {
+          this.isLoading = false;
+          this.toast.error('Failed to score CV.');
+        }
+      });
     });
   }
 

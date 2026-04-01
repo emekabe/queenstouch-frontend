@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { CvService } from '../../../core/services/cv.service';
@@ -99,6 +99,7 @@ export class CvListComponent implements OnInit {
   orderService = inject(OrderService);
   toast = inject(ToastService);
   router = inject(Router);
+  cdr = inject(ChangeDetectorRef);
   cvs: any[] = [];
   isLoading = false;
 
@@ -108,13 +109,16 @@ export class CvListComponent implements OnInit {
 
   loadCvs() {
     this.isLoading = true;
+    this.cdr.detectChanges();
     this.cvService.list().subscribe({
       next: (res) => {
         this.isLoading = false;
-        this.cvs = res.data;
+        this.cvs = res.data || [];
+        this.cdr.detectChanges();
       },
       error: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         this.toast.error('Error loading CVs');
       }
     });

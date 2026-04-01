@@ -1,12 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AdminService } from '../../../core/services/admin.service';
+import { ToastService } from '../../../shared/services/toast.service';
+import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SpinnerComponent],
   template: `
     <div class="container-fluid py-2">
+      <app-spinner [show]="isLoading"></app-spinner>
       <h3 class="mb-4 text-navy">Overview</h3>
       
       <!-- Stats Row -->
@@ -17,8 +21,7 @@ import { CommonModule } from '@angular/common';
             <h6 class="text-muted m-0">Total Users</h6>
             <span class="icon text-primary rounded-circle p-2 bg-secondary">👥</span>
           </div>
-          <h2 class="m-0">1,245</h2>
-          <small class="text-success mt-2">+12% from last month</small>
+          <h2 class="m-0">{{ stats?.totalUsers || 0 }}</h2>
         </div>
         
         <div class="card p-4 shadow-sm border-none bg-white rounded">
@@ -26,8 +29,7 @@ import { CommonModule } from '@angular/common';
             <h6 class="text-muted m-0">Active Orders</h6>
             <span class="icon text-primary rounded-circle p-2 bg-secondary">🛍️</span>
           </div>
-          <h2 class="m-0">48</h2>
-          <small class="text-success mt-2">+5% from last month</small>
+          <h2 class="m-0">{{ stats?.totalOrders || 0 }}</h2>
         </div>
         
         <div class="card p-4 shadow-sm border-none bg-white rounded">
@@ -35,17 +37,7 @@ import { CommonModule } from '@angular/common';
             <h6 class="text-muted m-0">Premium Requests</h6>
             <span class="icon text-primary rounded-circle p-2 bg-secondary">⭐</span>
           </div>
-          <h2 class="m-0">12</h2>
-          <small class="text-warning mt-2">5 pending review</small>
-        </div>
-        
-        <div class="card p-4 shadow-sm border-none bg-white rounded">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <h6 class="text-muted m-0">Revenue (Monthly)</h6>
-            <span class="icon text-primary rounded-circle p-2 bg-secondary">💰</span>
-          </div>
-          <h2 class="m-0">₦450k</h2>
-          <small class="text-success mt-2">+18% from last month</small>
+          <h2 class="m-0">{{ stats?.totalPremiumRequests || 0 }}</h2>
         </div>
         
       </div>
@@ -55,26 +47,17 @@ import { CommonModule } from '@angular/common';
         <h5 class="mb-4">Recent Activity</h5>
         
         <div class="activity-list border border-secondary rounded p-3">
-          <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+          <div *ngFor="let act of recentActivities; let last = last" 
+               class="d-flex justify-content-between align-items-center py-2"
+               [class.border-bottom]="!last">
             <div>
-              <span class="fw-500">New Order</span>
-              <p class="small text-muted m-0">User john@example.com purchased CV Review</p>
+              <span class="fw-500">{{ act.title }}</span>
+              <p class="small text-muted m-0">{{ act.desc }}</p>
             </div>
-            <span class="small text-muted">2 mins ago</span>
+            <span class="small text-muted">{{ act.time | date:'short' }}</span>
           </div>
-          <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
-            <div>
-              <span class="fw-500">Premium Request</span>
-              <p class="small text-muted m-0">Sarah submitted a new Premium Overhaul request</p>
-            </div>
-            <span class="small text-muted">1 hour ago</span>
-          </div>
-          <div class="d-flex justify-content-between align-items-center py-2">
-            <div>
-              <span class="fw-500">New User Registration</span>
-              <p class="small text-muted m-0">Mike T. created an account</p>
-            </div>
-            <span class="small text-muted">3 hours ago</span>
+          <div *ngIf="recentActivities.length === 0 && !isLoading" class="text-center text-muted py-3">
+             No recent activity.
           </div>
         </div>
         
@@ -120,4 +103,35 @@ import { CommonModule } from '@angular/common';
     .small { font-size: 0.875rem; }
   `]
 })
-export class AdminDashboardComponent {}
+export class AdminDashboardComponent implements OnInit {
+  adminService = inject(AdminService);
+  toast = inject(ToastService);
+  cdr = inject(ChangeDetectorRef);
+
+  isLoading = true;
+  stats: any = null;
+  recentActivities: any[] = [];
+
+  ngOnInit() {
+    this.isLoading = true;
+    this.adminService.getStats().subscribe({
+      next: (res) => {
+        this.stats = res.data;
+        this.cdr.detectChanges();
+      },
+      error: () => this.toast.error('Failed to load stats')
+    });
+
+    this.adminService.getRecentActivity().subscribe({
+      next: (res) => {
+        this.recentActivities = res.data;
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+}

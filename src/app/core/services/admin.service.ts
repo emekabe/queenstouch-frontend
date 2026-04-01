@@ -35,6 +35,17 @@ export class AdminService {
     return this.http.put<ApiResponse<PremiumServiceRequest>>(`${this.baseUrl}/premium-requests/${id}/status`, data);
   }
 
+  deliverPremiumCV(id: string, file: File, notes: string): Observable<ApiResponse<PremiumServiceRequest>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (notes) formData.append('notes', notes);
+    return this.http.post<ApiResponse<PremiumServiceRequest>>(`${this.baseUrl}/premium-requests/${id}/deliver`, formData);
+  }
+
+  getRecentActivity(): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/recent-activity`);
+  }
+
   getAllPricing(): Observable<ApiResponse<PricingConfig[]>> {
     return this.http.get<ApiResponse<PricingConfig[]>>(`${this.baseUrl}/pricing`);
   }

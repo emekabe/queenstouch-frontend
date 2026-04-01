@@ -16,7 +16,7 @@ export class UserService {
     return this.http.get<ApiResponse<UserResponse>>(`${this.baseUrl}/me`);
   }
 
-  updateProfile(data: { name?: string; phoneNumber?: string }): Observable<ApiResponse<UserResponse>> {
+  updateProfile(data: { firstName?: string; lastName?: string; phone?: string }): Observable<ApiResponse<UserResponse>> {
     return this.http.put<ApiResponse<UserResponse>>(`${this.baseUrl}/me`, data);
   }
 

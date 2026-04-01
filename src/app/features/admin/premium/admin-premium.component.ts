@@ -191,11 +191,9 @@ export class AdminPremiumComponent implements OnInit {
     if (!this.selectedRequest || !this.deliveryFile || this.deliverForm.invalid) return;
     this.isLoading = true;
     
-    // File upload happens in premium file upload service normally, but AdminService doesn't accept file here yet.
-    // So we just update status to complete with notes.
     const feedback = this.deliverForm.value.feedback;
     
-    this.adminService.updatePremiumRequestStatus(this.selectedRequest.id, { status: 'COMPLETED', adminNotes: feedback || undefined }).subscribe({
+    this.adminService.deliverPremiumCV(this.selectedRequest.id, this.deliveryFile, feedback || '').subscribe({
       next: () => {
         this.isLoading = false;
         this.toast.success('CV Delivered successfully (Status updated to COMPLETED)!');
