@@ -3,8 +3,16 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap, catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
-import { UserResponse, User } from '../models/user.model';
+import { UserResponse } from '../models/user.model';
 import { AuthResponse } from '../models/auth.model';
+import { 
+  LoginRequest, 
+  RegisterRequest, 
+  VerifyEmailRequest, 
+  ForgotPasswordRequest, 
+  ResetPasswordRequest, 
+  RefreshTokenRequest 
+} from '../models/auth-request.model';
 
 @Injectable({
   providedIn: 'root'
@@ -49,15 +57,15 @@ export class AuthService {
     this.currentUserSubject.next(null);
   }
 
-  register(data: any): Observable<ApiResponse<UserResponse>> {
+  register(data: RegisterRequest): Observable<ApiResponse<UserResponse>> {
     return this.http.post<ApiResponse<UserResponse>>(`${this.baseUrl}/register`, data);
   }
 
-  verifyEmail(data: any): Observable<ApiResponse<void>> {
+  verifyEmail(data: VerifyEmailRequest): Observable<ApiResponse<void>> {
     return this.http.post<ApiResponse<void>>(`${this.baseUrl}/verify-email`, data);
   }
 
-  login(data: any): Observable<ApiResponse<AuthResponse>> {
+  login(data: LoginRequest): Observable<ApiResponse<AuthResponse>> {
     return this.http.post<ApiResponse<AuthResponse>>(`${this.baseUrl}/login`, data).pipe(
       tap(res => {
         if (res.success && res.data) {
@@ -67,15 +75,15 @@ export class AuthService {
     );
   }
 
-  forgotPassword(data: any): Observable<ApiResponse<void>> {
+  forgotPassword(data: ForgotPasswordRequest): Observable<ApiResponse<void>> {
     return this.http.post<ApiResponse<void>>(`${this.baseUrl}/forgot-password`, data);
   }
 
-  resetPassword(data: any): Observable<ApiResponse<void>> {
+  resetPassword(data: ResetPasswordRequest): Observable<ApiResponse<void>> {
     return this.http.post<ApiResponse<void>>(`${this.baseUrl}/reset-password`, data);
   }
 
-  refresh(data: any): Observable<ApiResponse<AuthResponse>> {
+  refresh(data: RefreshTokenRequest): Observable<ApiResponse<AuthResponse>> {
     return this.http.post<ApiResponse<AuthResponse>>(`${this.baseUrl}/refresh`, data).pipe(
       tap(res => {
         if (res.success && res.data) {

@@ -11,3 +11,7 @@ export interface LinkedInProfile {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface GenerateLinkedInRequest {
+  careerSummaryInput: string;
+}

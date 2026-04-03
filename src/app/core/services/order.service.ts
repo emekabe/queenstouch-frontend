@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
 import { Order } from '../models/order.model';
+import { PricingConfig } from '../models/pricing-config.model';
+import { CreateOrderRequest } from '../models/order-request.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,11 +14,11 @@ export class OrderService {
   private readonly baseUrl = environment.apiUrl + '/orders';
   private readonly http = inject(HttpClient);
 
-  getPricingCatalogue(): Observable<ApiResponse<any[]>> {
-    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/pricing`);
+  getPricingCatalogue(): Observable<ApiResponse<PricingConfig[]>> {
+    return this.http.get<ApiResponse<PricingConfig[]>>(`${this.baseUrl}/pricing`);
   }
 
-  createOrder(data: { serviceKeys: string[]; relatedDocumentId?: string; relatedDocumentType?: string }): Observable<ApiResponse<Order>> {
+  createOrder(data: CreateOrderRequest): Observable<ApiResponse<Order>> {
     return this.http.post<ApiResponse<Order>>(this.baseUrl, data);
   }
 

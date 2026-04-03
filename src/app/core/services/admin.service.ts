@@ -5,8 +5,10 @@ import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
 import { User } from '../models/user.model';
 import { Order } from '../models/order.model';
-import { PremiumServiceRequest } from '../models/premium-request.model';
+import { PremiumServiceRequest, RequestStatus } from '../models/premium-request.model';
 import { PricingConfig } from '../models/pricing-config.model';
+import { AdminStats, RecentActivity } from '../models/admin-response.model';
+import { UpdatePricingRequest } from '../models/order-request.model';
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +17,8 @@ export class AdminService {
   private readonly baseUrl = environment.apiUrl + '/admin';
   private readonly http = inject(HttpClient);
 
-  getStats(): Observable<ApiResponse<{totalUsers: number; totalOrders: number; totalPremiumRequests: number}>> {
-    return this.http.get<ApiResponse<any>>(`${this.baseUrl}/stats`);
+  getStats(): Observable<ApiResponse<AdminStats>> {
+    return this.http.get<ApiResponse<AdminStats>>(`${this.baseUrl}/stats`);
   }
 
   getUsers(): Observable<ApiResponse<User[]>> {
@@ -31,7 +33,7 @@ export class AdminService {
     return this.http.get<ApiResponse<PremiumServiceRequest[]>>(`${this.baseUrl}/premium-requests`);
   }
 
-  updatePremiumRequestStatus(id: string, data: { status: string; adminNotes?: string }): Observable<ApiResponse<PremiumServiceRequest>> {
+  updatePremiumRequestStatus(id: string, data: { status: RequestStatus; adminNotes?: string }): Observable<ApiResponse<PremiumServiceRequest>> {
     return this.http.put<ApiResponse<PremiumServiceRequest>>(`${this.baseUrl}/premium-requests/${id}/status`, data);
   }
 
@@ -42,15 +44,15 @@ export class AdminService {
     return this.http.post<ApiResponse<PremiumServiceRequest>>(`${this.baseUrl}/premium-requests/${id}/deliver`, formData);
   }
 
-  getRecentActivity(): Observable<ApiResponse<any[]>> {
-    return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/recent-activity`);
+  getRecentActivity(): Observable<ApiResponse<RecentActivity[]>> {
+    return this.http.get<ApiResponse<RecentActivity[]>>(`${this.baseUrl}/recent-activity`);
   }
 
   getAllPricing(): Observable<ApiResponse<PricingConfig[]>> {
     return this.http.get<ApiResponse<PricingConfig[]>>(`${this.baseUrl}/pricing`);
   }
 
-  updatePricing(serviceKey: string, data: { minPrice: number; maxPrice: number }): Observable<ApiResponse<PricingConfig>> {
+  updatePricing(serviceKey: string, data: UpdatePricingRequest): Observable<ApiResponse<PricingConfig>> {
     return this.http.put<ApiResponse<PricingConfig>>(`${this.baseUrl}/pricing/${serviceKey}`, data);
   }
 }

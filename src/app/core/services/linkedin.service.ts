@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
-import { LinkedInProfile } from '../models/linkedin.model';
+import { LinkedInProfile, GenerateLinkedInRequest } from '../models/linkedin.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,7 @@ export class LinkedInService {
   private readonly baseUrl = environment.apiUrl + '/linkedin';
   private readonly http = inject(HttpClient);
 
-  generate(data: any): Observable<ApiResponse<LinkedInProfile>> {
+  generate(data: GenerateLinkedInRequest): Observable<ApiResponse<LinkedInProfile>> {
     return this.http.post<ApiResponse<LinkedInProfile>>(`${this.baseUrl}/generate`, data);
   }
 

@@ -8,9 +8,9 @@ export interface UserResponse {
   firstName: string;
   lastName: string;
   email: string;
-  phone?: string;
-  emailVerified: boolean;
+  phone: string;
   role: Role;
+  emailVerified: boolean;
   createdAt: string;
 }
 
@@ -24,4 +24,15 @@ export interface User {
   emailVerified: boolean;
   role: Role;
   createdAt: string;
+}
+
+export interface UpdateProfileRequest {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
 }

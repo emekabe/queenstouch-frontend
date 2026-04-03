@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
-import { UserResponse } from '../models/user.model';
+import { UserResponse, UpdateProfileRequest, ChangePasswordRequest } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -16,11 +16,11 @@ export class UserService {
     return this.http.get<ApiResponse<UserResponse>>(`${this.baseUrl}/me`);
   }
 
-  updateProfile(data: { firstName?: string; lastName?: string; phone?: string }): Observable<ApiResponse<UserResponse>> {
-    return this.http.put<ApiResponse<UserResponse>>(`${this.baseUrl}/me`, data);
+  updateProfile(data: UpdateProfileRequest): Observable<ApiResponse<UserResponse>> {
+    return this.http.put<ApiResponse<UserResponse>>((this.baseUrl + '/me'), data);
   }
 
-  changePassword(data: any): Observable<ApiResponse<void>> {
-    return this.http.put<ApiResponse<void>>(`${this.baseUrl}/me/password`, data);
+  changePassword(data: ChangePasswordRequest): Observable<ApiResponse<void>> {
+    return this.http.put<ApiResponse<void>>((this.baseUrl + '/me/password'), data);
   }
 }

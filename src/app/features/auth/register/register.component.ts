@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../shared/services/toast.service';
+import { RegisterRequest } from '../../../core/models/auth-request.model';
 import { LogoComponent } from '../../../shared/components/logo/logo.component';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 
@@ -149,7 +150,7 @@ export class RegisterComponent {
     if (this.registerForm.invalid) return;
 
     this.isLoading = true;
-    const data = this.registerForm.value as any;
+    const data = this.registerForm.value as RegisterRequest;
 
     this.authService.register(data).subscribe({
       next: () => {

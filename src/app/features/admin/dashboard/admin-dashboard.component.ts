@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { AdminService } from '../../../core/services/admin.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
+import { AdminStats, RecentActivity } from '../../../core/models/admin-response.model';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -109,8 +110,8 @@ export class AdminDashboardComponent implements OnInit {
   cdr = inject(ChangeDetectorRef);
 
   isLoading = true;
-  stats: any = null;
-  recentActivities: any[] = [];
+  stats: AdminStats | null = null;
+  recentActivities: RecentActivity[] = [];
 
   ngOnInit() {
     this.isLoading = true;

@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../shared/services/toast.service';
+import { LoginRequest } from '../../../core/models/auth-request.model';
 import { LogoComponent } from '../../../shared/components/logo/logo.component';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 
@@ -122,9 +123,9 @@ export class LoginComponent {
     if (this.loginForm.invalid) return;
 
     this.isLoading = true;
-    const { email, password } = this.loginForm.value;
+    const data = this.loginForm.value as LoginRequest;
 
-    this.authService.login({ email: email!, password: password! }).subscribe({
+    this.authService.login(data).subscribe({
       next: (res) => {
         this.isLoading = false;
         this.toast.success('Logged in successfully!');

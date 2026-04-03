@@ -4,16 +4,21 @@ export enum OrderStatus {
   CANCELLED = 'CANCELLED'
 }
 
+export interface OrderItem {
+  serviceKey: string;
+  label: string;
+  amountNgn: number;
+}
+
 export interface Order {
   id: string;
   userId: string;
-  serviceKey: string;
-  documentId?: string; // e.g. CV ID or Cover Letter ID
-  amount: number;
-  currency: string;
+  items: OrderItem[];
+  totalAmountNgn: number;
   status: OrderStatus;
-  paymentReference?: string;
+  paymentRef?: string;
+  relatedDocumentId?: string;
+  relatedDocumentType?: string;
   paidAt?: string;
   createdAt: string;
-  updatedAt: string;
 }

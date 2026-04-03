@@ -117,11 +117,11 @@ export class CheckoutComponent implements OnInit {
     this.isLoading = true;
     this.cdr.detectChanges();
     this.orderService.getPricingCatalogue().subscribe({
-      next: (res: any) => {
-        const data = res.data || res;
-        const pricingInfo = data[this.serviceKey];
+      next: (res) => {
+        const pricingArr = res.data;
+        const pricingInfo = pricingArr.find(p => p.serviceKey === this.serviceKey);
         if (pricingInfo) {
-          this.price = pricingInfo.minPrice || pricingInfo;
+          this.price = pricingInfo.minPrice;
           this.itemLabel = pricingInfo.label || this.itemLabel;
         } else {
           // Fallback if key doesn't match exactly

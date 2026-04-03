@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { OrderService } from '../../../core/services/order.service';
 import { ToastService } from '../../../shared/services/toast.service';
+import { Order } from '../../../core/models/order.model';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { NairaPipe } from '../../../shared/pipes/naira.pipe';
@@ -26,7 +27,7 @@ import { NairaPipe } from '../../../shared/pipes/naira.pipe';
           <thead class="bg-secondary">
             <tr>
               <th>Order ID</th>
-              <th>Service</th>
+              <th>Services</th>
               <th>Amount</th>
               <th>Status</th>
               <th>Date</th>
@@ -35,8 +36,10 @@ import { NairaPipe } from '../../../shared/pipes/naira.pipe';
           <tbody>
             <tr *ngFor="let order of orders">
               <td><span class="small text-muted">{{ order.id }}</span></td>
-              <td class="fw-500">{{ order.itemType }}</td>
-              <td>{{ order.amount | naira }}</td>
+              <td class="fw-500">
+                <div *ngFor="let item of order.items" class="small">{{ item.label }}</div>
+              </td>
+              <td>{{ order.totalAmountNgn | naira }}</td>
               <td>
                 <span class="badge" 
                   [ngClass]="{
@@ -92,16 +95,16 @@ export class OrderHistoryComponent implements OnInit {
   toast = inject(ToastService);
   cdr = inject(ChangeDetectorRef);
   
-  orders: any[] = [];
+  orders: Order[] = [];
   isLoading = false;
 
   ngOnInit() {
     this.isLoading = true;
     this.cdr.detectChanges();
     this.orderService.listForUser().subscribe({
-      next: (res: any) => {
+      next: (res) => {
         this.isLoading = false;
-        this.orders = res.data.content || res.data; 
+        this.orders = res.data; 
         this.cdr.detectChanges();
       },
       error: () => {

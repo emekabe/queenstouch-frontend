@@ -25,3 +25,8 @@ export interface PremiumServiceRequest {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface CreatePremiumRequestDto {
+  serviceType: PremiumServiceType;
+  notes?: string;
+}

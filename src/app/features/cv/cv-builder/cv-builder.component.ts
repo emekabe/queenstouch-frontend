@@ -123,15 +123,15 @@ import { NavbarComponent } from '../../../shared/components/navbar/navbar.compon
                         </div>
                         <div class="form-group" style="grid-column: span 2;">
                           <div class="form-check">
-                            <input class="form-check-input" type="checkbox" formControlName="currentJob" [id]="'currentJob' + i">
-                            <label class="form-check-label" [for]="'currentJob' + i">I currently work here</label>
+                            <input class="form-check-input" type="checkbox" formControlName="current" [id]="'current' + i">
+                            <label class="form-check-label" [for]="'current' + i">I currently work here</label>
                           </div>
                         </div>
-                        <div class="form-group" *ngIf="!exp.get('currentJob')?.value">
+                        <div class="form-group" *ngIf="!exp.get('current')?.value">
                           <label class="form-label">End Date</label>
                           <input type="month" class="form-control" formControlName="endDate">
                         </div>
-                        <div class="form-group" *ngIf="exp.get('currentJob')?.value">
+                        <div class="form-group" *ngIf="exp.get('current')?.value">
                           <label class="form-label text-muted d-block pt-4">Present</label>
                         </div>
                         <div class="form-group" style="grid-column: span 2;">
@@ -471,27 +471,28 @@ export class CvBuilderComponent implements OnInit {
         if (cv.professionalSummary) {
           this.cvForm.get('professionalSummary')?.patchValue(cv.professionalSummary);
         }
-        if (cv.experience && Array.isArray(cv.experience)) {
+        if (cv.workExperiences && Array.isArray(cv.workExperiences)) {
           this.experienceArray.clear();
-          cv.experience.forEach((e: any) => {
+          cv.workExperiences.forEach((e: any) => {
             const group = this.fb.group({
               jobTitle: [e.jobTitle || ''],
               company: [e.company || ''],
               startDate: [e.startDate || ''],
               endDate: [e.endDate || ''],
-              currentJob: [e.currentJob || false],
-              description: [e.description || '']
+              current: [e.current || false],
+              description: [e.bullets && e.bullets.length > 0 ? e.bullets[0] : '']
             });
             this.experienceArray.push(group);
           });
         }
-        if (cv.education && Array.isArray(cv.education)) {
+        if (cv.educations && Array.isArray(cv.educations)) {
           this.educationArray.clear();
-          cv.education.forEach((e: any) => {
+          cv.educations.forEach((e: any) => {
             this.educationArray.push(this.fb.group({
               institution: [e.institution || ''],
               degree: [e.degree || ''],
               fieldOfStudy: [e.fieldOfStudy || ''],
+              grade: [e.grade || ''],
               startDate: [e.startDate || ''],
               endDate: [e.endDate || '']
             }));
@@ -532,6 +533,7 @@ export class CvBuilderComponent implements OnInit {
       company: [''],
       startDate: [''],
       endDate: [''],
+      current: [false],
       description: ['']
     });
     this.experienceArray.push(group);
@@ -546,6 +548,7 @@ export class CvBuilderComponent implements OnInit {
       institution: [''],
       degree: [''],
       fieldOfStudy: [''],
+      grade: [''],
       startDate: [''],
       endDate: ['']
     }));
@@ -595,14 +598,16 @@ export class CvBuilderComponent implements OnInit {
     const v = this.cvForm.value;
     
     // 1. Map Personal Info
-    const personalInfoPayload = {
+    const personalInfoPayload: any = {
       fullName: `${v.personalInfo.firstName} ${v.personalInfo.lastName}`.trim(),
       email: v.personalInfo.email,
       phone: v.personalInfo.phone,
       linkedinUrl: v.personalInfo.linkedin,
       portfolioUrl: v.personalInfo.portfolio,
       title: v.personalInfo.targetJobTitle,
-      summary: v.professionalSummary
+      summary: v.professionalSummary,
+      cvType: 'STANDARD', // Default for this builder
+      scholarshipMode: false
     };
 
     const obs$ = this.cvId 
@@ -738,7 +743,7 @@ export class CvBuilderComponent implements OnInit {
       this.cvService.scoreCv(this.cvId!).subscribe({
         next: (res: any) => {
           this.isLoading = false;
-          this.cvScore = res.data.score || res.data;
+          this.cvScore = res.data.overall;
           this.toast.success('CV successfully analyzed!');
           this.cdr.detectChanges();
         },

@@ -1,3 +1,5 @@
+import { CvScore, JobMatchResult } from './cv-response.model';
+
 export enum CvType {
   STANDARD = 'STANDARD',
   ACADEMIC = 'ACADEMIC'
@@ -26,20 +28,22 @@ export interface PersonalInfo {
 }
 
 export interface WorkExperience {
-    id?: string;
+  id?: string;
   company: string;
   jobTitle: string;
-  startDate: string; // ISO String
+  location?: string;
+  startDate: string; // ISO String or "YYYY-MM"
   endDate?: string;
-  currentJob: boolean;
-  achievements: string[];
+  current: boolean;
+  bullets: string[];
 }
 
 export interface Education {
-    id?: string;
+  id?: string;
   institution: string;
   degree: string;
   fieldOfStudy: string;
+  grade?: string;
   startDate: string;
   endDate?: string;
 }
@@ -50,12 +54,10 @@ export interface Skill {
 }
 
 export interface Certification {
-    id?: string;
+  id?: string;
   name: string;
-  issuingOrganization: string;
-  issueDate?: string;
-  credentialId?: string;
-  credentialUrl?: string;
+  issuer: string;
+  year: string;
 }
 
 export interface Publication {
@@ -75,33 +77,29 @@ export interface Conference {
   description?: string;
 }
 
-export interface CvScore {
-  score: number;
-  feedback: string[];
-}
-
-export interface JobMatchResult {
-  matchPercentage: number;
-  matchingKeywords: string[];
-  missingKeywords: string[];
-  suggestions: string[];
-}
+// Removing local CvScore and JobMatchResult interfaces as they are now in cv-response.model.ts
 
 export interface CvDocument {
   id: string;
   userId: string;
   type: CvType;
   status: CvStatus;
-  isScholarshipApplication: boolean;
-  score?: CvScore;
-  jobMatchResult?: JobMatchResult;
+  scholarshipMode: boolean;
+  cvScore?: CvScore;
+  lastJobMatchResult?: JobMatchResult;
   lastAnalysisDate?: string;
   
   // Standard Sections
   personalInfo?: PersonalInfo;
+  fullName?: string; // Unified with backend
+  phone?: string;
+  location?: string;
+  linkedinUrl?: string;
+  portfolioUrl?: string;
   professionalSummary?: string;
-  workExperience: WorkExperience[];
-  education: Education[];
+  summary?: string; // Backend field name
+  workExperiences: WorkExperience[];
+  education: Education[]; // Map from backend 'educations'
   skills: Skill[];
   certifications: Certification[];
   
