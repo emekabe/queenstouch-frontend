@@ -103,6 +103,7 @@ export class AdminOrdersComponent implements OnInit {
 
   loadOrders() {
     this.isLoading = true;
+    this.cdr.detectChanges();
     this.adminService.getOrders().subscribe({
       next: (res: any) => {
         this.isLoading = false;

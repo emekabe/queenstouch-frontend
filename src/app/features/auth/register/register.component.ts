@@ -50,8 +50,11 @@ import { SpinnerComponent } from '../../../shared/components/spinner/spinner.com
           </div>
           
           <div class="form-group">
-            <label class="form-label" for="phoneNumber">Phone Number (Optional)</label>
-            <input id="phoneNumber" type="tel" class="form-control" formControlName="phoneNumber" placeholder="Enter your phone number">
+            <label class="form-label" for="phone">Phone Number</label>
+            <input id="phone" type="tel" class="form-control" formControlName="phone" placeholder="Enter your phone number">
+            <div *ngIf="registerForm.get('phone')?.touched && registerForm.get('phone')?.invalid" class="text-danger mt-1" style="font-size: 13px;">
+              Phone number is required.
+            </div>
           </div>
 
           <div class="form-group">
@@ -139,7 +142,7 @@ export class RegisterComponent {
     lastName: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
-    phoneNumber: ['']
+    phone: ['', Validators.required]
   });
 
   onSubmit() {

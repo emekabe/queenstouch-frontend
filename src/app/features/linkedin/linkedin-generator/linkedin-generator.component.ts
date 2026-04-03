@@ -1,16 +1,18 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { LinkedInService } from '../../../core/services/linkedin.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-linkedin-generator',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, SpinnerComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, SpinnerComponent, NavbarComponent],
   template: `
+    <app-navbar></app-navbar>
     <div class="bg-secondary min-vh-100 py-5">
       <app-spinner [show]="isLoading"></app-spinner>
       <div class="container" style="max-width: 800px;">
@@ -111,6 +113,7 @@ export class LinkedInGeneratorComponent {
   private linkedInService = inject(LinkedInService);
   private toast = inject(ToastService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   isLoading = false;
   generatedProfile: any = null;
@@ -123,15 +126,20 @@ export class LinkedInGeneratorComponent {
   generate() {
     if (this.linkedinForm.invalid) return;
     this.isLoading = true;
+    const payload = {
+      careerSummaryInput: this.linkedinForm.value.currentCvContent
+    };
     
-    this.linkedInService.generate(this.linkedinForm.value).subscribe({
+    this.linkedInService.generate(payload).subscribe({
       next: (res: any) => {
         this.isLoading = false;
         this.generatedProfile = res.data;
         this.toast.success('LinkedIn profile optimized successfully!');
+        this.cdr.detectChanges();
       },
       error: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         this.toast.error('Failed to optimize profile.');
       }
     });

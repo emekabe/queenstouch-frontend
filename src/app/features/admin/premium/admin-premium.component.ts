@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AdminService } from '../../../core/services/admin.service';
 import { ToastService } from '../../../shared/services/toast.service';
@@ -131,6 +131,7 @@ export class AdminPremiumComponent implements OnInit {
   private fb = inject(FormBuilder);
   adminService = inject(AdminService);
   toast = inject(ToastService);
+  cdr = inject(ChangeDetectorRef);
   
   requests: any[] = [];
   isLoading = false;
@@ -148,13 +149,16 @@ export class AdminPremiumComponent implements OnInit {
 
   loadRequests() {
     this.isLoading = true;
+    this.cdr.detectChanges();
     this.adminService.getPremiumRequests().subscribe({
       next: (res: any) => {
         this.isLoading = false;
-        this.requests = res.data.content || res.data;
+        this.requests = res.data.content || res.data || [];
+        this.cdr.detectChanges();
       },
       error: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         this.toast.error('Failed to load premium requests.');
       }
     });
@@ -162,14 +166,17 @@ export class AdminPremiumComponent implements OnInit {
 
   updateStatus(req: any, status: string) {
     this.isLoading = true;
+    this.cdr.detectChanges();
     this.adminService.updatePremiumRequestStatus(req.id, { status }).subscribe({
       next: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         this.toast.success(`Request marked as ${status.replace('_', ' ')}.`);
         this.loadRequests();
       },
       error: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         this.toast.error('Failed to update status.');
       }
     });

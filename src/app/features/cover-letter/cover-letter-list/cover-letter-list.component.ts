@@ -5,12 +5,14 @@ import { CoverLetterService } from '../../../core/services/cover-letter.service'
 import { OrderService } from '../../../core/services/order.service';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { ToastService } from '../../../shared/services/toast.service';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-cover-letter-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, SpinnerComponent],
+  imports: [CommonModule, RouterModule, SpinnerComponent, NavbarComponent],
   template: `
+    <app-navbar></app-navbar>
     <div class="container py-5 min-vh-100">
       <app-spinner [show]="isLoading"></app-spinner>
       
@@ -118,6 +120,7 @@ export class CoverLetterListComponent implements OnInit {
         },
         error: () => {
           this.isLoading = false;
+          this.cdr.detectChanges();
           this.toast.error('Failed to delete cover letter.');
         }
       });
@@ -137,22 +140,16 @@ export class CoverLetterListComponent implements OnInit {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
+        this.cdr.detectChanges();
       },
       error: (err) => {
         if (err.status === 402 || err.status === 403) {
-           this.orderService.createOrder({ serviceKey: 'COVER_LETTER_DOWNLOAD', documentId: id }).subscribe({
-             next: () => {
-               this.toast.success('Cover Letter Purchased! Downloading...');
-               this.downloadCL(id, format);
-             },
-             error: () => {
-               this.isLoading = false;
-               this.toast.error('Failed to process payment.');
-               this.router.navigate(['/orders/pricing']);
-             }
-           });
+           this.isLoading = false;
+           this.cdr.detectChanges();
+           this.router.navigate(['/orders/checkout', 'cover_letter', id]);
         } else {
           this.isLoading = false;
+          this.cdr.detectChanges();
           this.toast.error('Failed to download Cover Letter.');
         }
       }

@@ -16,7 +16,7 @@ export class OrderService {
     return this.http.get<ApiResponse<any[]>>(`${this.baseUrl}/pricing`);
   }
 
-  createOrder(data: { serviceKey: string; documentId?: string; saveCard?: boolean; useWallet?: boolean }): Observable<ApiResponse<Order>> {
+  createOrder(data: { serviceKeys: string[]; relatedDocumentId?: string; relatedDocumentType?: string }): Observable<ApiResponse<Order>> {
     return this.http.post<ApiResponse<Order>>(this.baseUrl, data);
   }
 

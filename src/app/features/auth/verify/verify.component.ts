@@ -14,7 +14,7 @@ import { SpinnerComponent } from '../../../shared/components/spinner/spinner.com
   template: `
     <div class="auth-layout">
       <app-spinner [show]="isLoading"></app-spinner>
-      
+
       <div class="auth-card card">
         <div class="text-center mb-4">
           <app-logo [height]="50"></app-logo>
@@ -25,11 +25,11 @@ import { SpinnerComponent } from '../../../shared/components/spinner/spinner.com
         <form [formGroup]="verifyForm" (ngSubmit)="onSubmit()">
           <div class="form-group text-center">
             <label class="form-label d-none" for="code">Verification Code</label>
-            <input 
-              id="code" 
-              type="text" 
-              class="form-control text-center code-input" 
-              formControlName="code" 
+            <input
+              id="code"
+              type="text"
+              class="form-control text-center code-input"
+              formControlName="code"
               placeholder="000000"
               maxlength="6">
           </div>
@@ -99,7 +99,7 @@ export class VerifyComponent implements OnInit {
     this.isLoading = true;
     const code = this.verifyForm.value.code!;
 
-    this.authService.verifyEmail({ email: this.email, verificationCode: code }).subscribe({
+    this.authService.verifyEmail({ email: this.email, otp: code }).subscribe({
       next: () => {
         this.isLoading = false;
         this.toast.success('Email verified successfully! You can now log in.');
@@ -117,7 +117,7 @@ export class VerifyComponent implements OnInit {
       this.toast.error('Email not found. Cannot resend code.');
       return;
     }
-    // In a real app we'd have a resend-code API endpoint. Using forgot-password to trigger code resend if it works, 
+    // In a real app we'd have a resend-code API endpoint. Using forgot-password to trigger code resend if it works,
     // or just inform the user.
     this.toast.success('Code resend functionality will be implemented soon.');
   }

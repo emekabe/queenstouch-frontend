@@ -5,12 +5,14 @@ import { CvService } from '../../../core/services/cv.service';
 import { OrderService } from '../../../core/services/order.service';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { ToastService } from '../../../shared/services/toast.service';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-cv-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, SpinnerComponent],
+  imports: [CommonModule, RouterModule, SpinnerComponent, NavbarComponent],
   template: `
+    <app-navbar></app-navbar>
     <div class="container py-5 min-vh-100">
       <app-spinner [show]="isLoading"></app-spinner>
       
@@ -134,6 +136,7 @@ export class CvListComponent implements OnInit {
         },
         error: () => {
           this.isLoading = false;
+          this.cdr.detectChanges();
           this.toast.error('Failed to delete CV');
         }
       });
@@ -160,23 +163,16 @@ export class CvListComponent implements OnInit {
         a.click();
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
+        this.cdr.detectChanges();
       },
       error: (err) => {
         if (err.status === 402 || err.status === 403) {
-           // Purchase flow required
-           this.orderService.createOrder({ serviceKey: 'STANDARD_CV_DOWNLOAD', documentId: id }).subscribe({
-             next: () => {
-               this.toast.success('CV Purchased! Downloading...');
-               this.downloadCv(id, format); // retry download
-             },
-             error: () => {
-               this.isLoading = false;
-               this.toast.error('Failed to process payment. Please visit pricing page.');
-               this.router.navigate(['/orders/pricing']);
-             }
-           });
+           this.isLoading = false;
+           this.cdr.detectChanges();
+           this.router.navigate(['/orders/checkout', 'cv', id]);
         } else {
           this.isLoading = false;
+          this.cdr.detectChanges();
           this.toast.error('Failed to download CV.');
         }
       }

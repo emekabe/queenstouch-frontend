@@ -1,15 +1,18 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { OrderService } from '../../../core/services/order.service';
 import { ToastService } from '../../../shared/services/toast.service';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { NairaPipe } from '../../../shared/pipes/naira.pipe';
 
 @Component({
   selector: 'app-order-history',
   standalone: true,
-  imports: [CommonModule, SpinnerComponent, NairaPipe],
+  imports: [CommonModule, RouterModule, SpinnerComponent, NavbarComponent, NairaPipe],
   template: `
+    <app-navbar></app-navbar>
     <div class="container py-5 min-vh-100">
       <app-spinner [show]="isLoading"></app-spinner>
       
@@ -87,19 +90,23 @@ import { NairaPipe } from '../../../shared/pipes/naira.pipe';
 export class OrderHistoryComponent implements OnInit {
   orderService = inject(OrderService);
   toast = inject(ToastService);
+  cdr = inject(ChangeDetectorRef);
   
   orders: any[] = [];
   isLoading = false;
 
   ngOnInit() {
     this.isLoading = true;
+    this.cdr.detectChanges();
     this.orderService.listForUser().subscribe({
       next: (res: any) => {
         this.isLoading = false;
         this.orders = res.data.content || res.data; 
+        this.cdr.detectChanges();
       },
       error: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         this.toast.error('Failed to load order history.');
       }
     });

@@ -1,15 +1,18 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { OrderService } from '../../../core/services/order.service';
 import { ToastService } from '../../../shared/services/toast.service';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { NairaPipe } from '../../../shared/pipes/naira.pipe';
 
 @Component({
   selector: 'app-pricing',
   standalone: true,
-  imports: [CommonModule, SpinnerComponent, NairaPipe],
+  imports: [CommonModule, RouterModule, SpinnerComponent, NavbarComponent, NairaPipe],
   template: `
+    <app-navbar></app-navbar>
     <div class="bg-secondary min-vh-100 py-5">
       <app-spinner [show]="isLoading"></app-spinner>
       <div class="container text-center">
@@ -18,8 +21,8 @@ import { NairaPipe } from '../../../shared/pipes/naira.pipe';
         
         <div class="pricing-grid">
           <div class="card p-4 shadow-sm border-none" *ngFor="let item of pricingList">
-            <h4 class="text-navy">{{ item.serviceType.replace('_', ' ') }}</h4>
-            <h2 class="mt-3 mb-4 text-orange">{{ item.price | naira }}</h2>
+            <h4 class="text-navy">{{ (item.label || item.serviceType).replace('_', ' ') }}</h4>
+            <h2 class="mt-3 mb-4 text-orange">{{ (item.minPrice || item.price) | naira }}</h2>
             <ul class="text-start mb-4">
               <li *ngIf="item.serviceType === 'STANDARD_CV_DOWNLOAD' || item.serviceType === 'ACADEMIC_CV_DOWNLOAD'">Download perfectly formatted ATS-optimized PDF</li>
               <li *ngIf="item.serviceType === 'COVER_LETTER_DOWNLOAD'">Download AI-generated, tailored Cover Letter</li>
@@ -61,26 +64,32 @@ import { NairaPipe } from '../../../shared/pipes/naira.pipe';
 export class PricingComponent implements OnInit {
   orderService = inject(OrderService);
   toast = inject(ToastService);
+  cdr = inject(ChangeDetectorRef);
 
   isLoading = true;
   pricingList: any[] = [];
 
   ngOnInit() {
+    this.isLoading = true;
+    this.cdr.detectChanges();
     this.orderService.getPricingCatalogue().subscribe({
       next: (res: any) => {
-        this.isLoading = false;
         const data = res.data || res;
-        if (Array.isArray(data)) {
+        if (data && Array.isArray(data)) {
           this.pricingList = data;
-        } else {
+        } else if (data) {
           this.pricingList = Object.keys(data).map(key => ({
-            serviceType: key,
-            price: data[key]
+            serviceType: (data[key] as any).serviceKey || key,
+            label: (data[key] as any).label || key,
+            price: (data[key] as any).minPrice || data[key]
           }));
         }
+        this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         this.toast.error('Failed to load pricing catalogue.');
       }
     });
@@ -88,9 +97,11 @@ export class PricingComponent implements OnInit {
 
   placeOrder(item: any) {
     this.isLoading = true;
-    this.orderService.createOrder({ serviceKey: item.serviceType }).subscribe({
+    this.cdr.detectChanges();
+    this.orderService.createOrder({ serviceKeys: [item.serviceKey || item.serviceType] }).subscribe({
       next: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         // In our mock backend, order is immediately marked as PAID
         this.toast.success(`Purchased ${item.serviceType} successfully!`);
       },

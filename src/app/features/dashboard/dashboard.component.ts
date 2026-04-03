@@ -8,22 +8,14 @@ import { CoverLetterService } from '../../core/services/cover-letter.service';
 import { OrderService } from '../../core/services/order.service';
 import { User } from '../../core/models/user.model';
 import { LogoComponent } from '../../shared/components/logo/logo.component';
+import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, LogoComponent],
+  imports: [CommonModule, RouterModule, LogoComponent, NavbarComponent],
   template: `
-    <!-- Top Navbar -->
-    <header class="navbar bg-white border-bottom">
-      <div class="container d-flex justify-content-between align-items-center py-3">
-        <app-logo [height]="36"></app-logo>
-        <div class="user-menu d-flex align-items-center gap-3">
-          <span class="user-greeting">Hi, {{ user?.firstName || 'User' }}</span>
-          <button (click)="logout()" class="btn btn-outline-danger btn-sm text-danger" style="background: none; border: 1px solid var(--qt-danger);">Logout</button>
-        </div>
-      </div>
-    </header>
+    <app-navbar></app-navbar>
 
     <main class="dashboard-bg min-vh-100 py-5">
       <div class="container">
@@ -36,17 +28,26 @@ import { LogoComponent } from '../../shared/components/logo/logo.component';
         <div class="stats-grid mb-5">
           <div class="card hover-card stat-card border-none shadow-sm p-4">
             <h5 class="text-muted">Saved CVs</h5>
-            <h2 class="mt-2 text-navy">{{ cvCount }}</h2>
+            <h2 class="mt-2 text-navy">
+              <span *ngIf="!isLoadingStats">{{ cvCount }}</span>
+              <span *ngIf="isLoadingStats" class="placeholder-glow"><span class="placeholder col-4"></span></span>
+            </h2>
             <a routerLink="/cv/list" class="stretched-link">View All</a>
           </div>
           <div class="card hover-card stat-card border-none shadow-sm p-4">
             <h5 class="text-muted">Cover Letters</h5>
-            <h2 class="mt-2 text-navy">{{ clCount }}</h2>
+            <h2 class="mt-2 text-navy">
+              <span *ngIf="!isLoadingStats">{{ clCount }}</span>
+              <span *ngIf="isLoadingStats" class="placeholder-glow"><span class="placeholder col-4"></span></span>
+            </h2>
             <a routerLink="/cover-letters/list" class="stretched-link">View All</a>
           </div>
           <div class="card hover-card stat-card border-none shadow-sm p-4">
             <h5 class="text-muted">Premium Orders</h5>
-            <h2 class="mt-2 text-navy">{{ orderCount }}</h2>
+            <h2 class="mt-2 text-navy">
+              <span *ngIf="!isLoadingStats">{{ orderCount }}</span>
+              <span *ngIf="isLoadingStats" class="placeholder-glow"><span class="placeholder col-4"></span></span>
+            </h2>
             <a routerLink="/orders/history" class="stretched-link">View All</a>
           </div>
         </div>
@@ -84,17 +85,7 @@ import { LogoComponent } from '../../shared/components/logo/logo.component';
     </main>
   `,
   styles: [`
-    .navbar { position: sticky; top: 0; z-index: 1000; }
     .dashboard-bg { background-color: var(--qt-bg-secondary); }
-    .min-vh-100 { min-height: 100vh; }
-    .d-flex { display: flex; }
-    .justify-content-between { justify-content: space-between; }
-    .align-items-center { align-items: center; }
-    .gap-3 { gap: 1rem; }
-    .py-3 { padding-top: 1rem; padding-bottom: 1rem; }
-    .border-bottom { border-bottom: 1px solid var(--border-color); }
-    .text-navy { color: var(--qt-navy); }
-    .user-greeting { font-weight: 500; color: var(--qt-navy); }
     
     .stats-grid, .action-grid {
       display: grid;
@@ -141,42 +132,51 @@ import { LogoComponent } from '../../shared/components/logo/logo.component';
   `]
 })
 export class DashboardComponent implements OnInit {
-  authService = inject(AuthService);
   cvService = inject(CvService);
   clService = inject(CoverLetterService);
   orderService = inject(OrderService);
-  router = inject(Router);
   cdr = inject(ChangeDetectorRef);
 
-  user: User | null = null;
   cvCount = 0;
   clCount = 0;
   orderCount = 0;
+  isLoadingStats = true;
 
   ngOnInit() {
-    this.authService.currentUser$.subscribe(user => {
-      this.user = user as User;
-    });
     this.loadStats();
   }
 
   loadStats() {
-    this.cvService.list().subscribe(res => {
-      if (res.success && res.data) this.cvCount = res.data.length;
-      this.cdr.detectChanges();
-    });
-    this.clService.list().subscribe(res => {
-      if (res.success && res.data) this.clCount = res.data.length;
-      this.cdr.detectChanges();
-    });
-    this.orderService.listForUser().subscribe(res => {
-      if (res.success && res.data) this.orderCount = res.data.length;
-      this.cdr.detectChanges();
-    });
-  }
+    this.isLoadingStats = true;
+    let loaded = 0;
+    const checkAll = () => {
+      loaded++;
+      if (loaded >= 3) {
+        this.isLoadingStats = false;
+        this.cdr.detectChanges();
+      }
+    };
 
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/']);
+    this.cvService.list().subscribe({
+      next: res => {
+        if (res.success && res.data) this.cvCount = res.data.length;
+        checkAll();
+      },
+      error: () => checkAll()
+    });
+    this.clService.list().subscribe({
+      next: res => {
+        if (res.success && res.data) this.clCount = res.data.length;
+        checkAll();
+      },
+      error: () => checkAll()
+    });
+    this.orderService.listForUser().subscribe({
+      next: res => {
+        if (res.success && res.data) this.orderCount = res.data.length;
+        checkAll();
+      },
+      error: () => checkAll()
+    });
   }
 }

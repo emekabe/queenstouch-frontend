@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -6,17 +6,19 @@ import { CvService } from '../../../core/services/cv.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { ScoreRingComponent } from '../../../shared/components/score-ring/score-ring.component';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-cv-builder',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, SpinnerComponent, ScoreRingComponent],
+  imports: [CommonModule, ReactiveFormsModule, SpinnerComponent, ScoreRingComponent, NavbarComponent],
   template: `
+    <app-navbar></app-navbar>
     <div class="builder-layout bg-secondary min-vh-100 pb-5">
       <app-spinner [show]="isLoading"></app-spinner>
       
-      <!-- Top Navbar with Progress -->
-      <div class="bg-white border-bottom sticky-top py-3">
+      <!-- Progress Sub-Navbar -->
+      <div class="bg-white border-bottom sticky-sub-nav py-3">
         <div class="container d-flex justify-content-between align-items-center">
           <h4 class="m-0 text-navy">CV Builder</h4>
           
@@ -304,7 +306,7 @@ import { ScoreRingComponent } from '../../../shared/components/score-ring/score-
     .bg-white { background-color: #fff; }
     .border-bottom { border-bottom: 1px solid var(--border-color); }
     .border-top { border-top: 1px solid var(--border-color); }
-    .sticky-top { position: sticky; top: 0; z-index: 10; }
+    .sticky-sub-nav { position: sticky; top: 73px; z-index: 10; }
     
     .d-flex { display: flex; }
     .justify-content-between { justify-content: space-between; }
@@ -390,6 +392,7 @@ export class CvBuilderComponent implements OnInit {
   private toast = inject(ToastService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private cdr = inject(ChangeDetectorRef);
 
   isLoading = false;
   currentStep = 1;
@@ -460,6 +463,7 @@ export class CvBuilderComponent implements OnInit {
       next: (res: any) => {
         const cv = res.data;
         this.isLoading = false;
+        this.cdr.detectChanges();
         // Patch form
         if (cv.personalInfo) {
           this.cvForm.get('personalInfo')?.patchValue(cv.personalInfo);
@@ -516,6 +520,7 @@ export class CvBuilderComponent implements OnInit {
       },
       error: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         this.toast.error('Failed to load CV draft.');
       }
     });
@@ -611,6 +616,7 @@ export class CvBuilderComponent implements OnInit {
           this.cvId = res.data.id;
           this.cvForm.get('id')?.setValue(this.cvId);
         }
+        this.cdr.detectChanges();
         
         // 2. Map other sections if they exist and we are beyond step 1
         if (this.cvId) {
@@ -655,6 +661,7 @@ export class CvBuilderComponent implements OnInit {
       },
       error: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         this.toast.error('Failed to save CV.');
       }
     });
@@ -669,16 +676,29 @@ export class CvBuilderComponent implements OnInit {
       return;
     }
 
+    const v = this.cvForm.value;
+    const skills = v.skills.map((s: any) => s.name).join(', ');
+    const achievements = v.experience.map((e: any) => e.description).join('\n');
+    
     this.saveDraft(() => {
       this.isLoading = true;
-      this.cvService.generateSummary(this.cvId!, { jobTitle, currentSummary }).subscribe({
+      const payload = {
+        jobTitle,
+        yearsOfExperience: 'Several years', // Placeholder as not explicitly collected yet
+        skills,
+        achievements
+      };
+      
+      this.cvService.generateSummary(this.cvId!, payload).subscribe({
         next: (res: any) => {
           this.isLoading = false;
           this.cvForm.get('professionalSummary')?.setValue(res.data.summary);
           this.toast.success('Summary generated via AI.');
+          this.cdr.detectChanges();
         },
         error: () => {
           this.isLoading = false;
+          this.cdr.detectChanges();
           this.toast.error('Failed to generate summary.');
         }
       });
@@ -694,16 +714,19 @@ export class CvBuilderComponent implements OnInit {
     
     this.isLoading = true;
     this.cvService.generateAchievement({ 
-      originalTask: control.value,
-      jobTitle: this.experienceArray.at(index).get('jobTitle')?.value || ''
+      role: this.experienceArray.at(index).get('jobTitle')?.value || 'Professional',
+      task: control.value,
+      result: 'Significant impact' // Placeholder
     }).subscribe({
       next: (res: any) => {
         this.isLoading = false;
         control.setValue(res.data.bullet);
         this.toast.success('Achievement improved via AI.');
+        this.cdr.detectChanges();
       },
       error: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         this.toast.error('Failed to rewrite achievement.');
       }
     });
@@ -717,9 +740,11 @@ export class CvBuilderComponent implements OnInit {
           this.isLoading = false;
           this.cvScore = res.data.score || res.data;
           this.toast.success('CV successfully analyzed!');
+          this.cdr.detectChanges();
         },
         error: () => {
           this.isLoading = false;
+          this.cdr.detectChanges();
           this.toast.error('Failed to score CV.');
         }
       });

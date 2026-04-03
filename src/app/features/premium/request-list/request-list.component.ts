@@ -1,15 +1,17 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { PremiumRequestService } from '../../../core/services/premium-request.service';
 import { ToastService } from '../../../shared/services/toast.service';
+import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 
 @Component({
   selector: 'app-request-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, SpinnerComponent],
+  imports: [CommonModule, RouterModule, SpinnerComponent, NavbarComponent],
   template: `
+    <app-navbar></app-navbar>
     <div class="container py-5 min-vh-100">
       <app-spinner [show]="isLoading"></app-spinner>
       
@@ -95,19 +97,23 @@ import { SpinnerComponent } from '../../../shared/components/spinner/spinner.com
 export class RequestListComponent implements OnInit {
   reqService = inject(PremiumRequestService);
   toast = inject(ToastService);
+  cdr = inject(ChangeDetectorRef);
   
   requests: any[] = [];
   isLoading = false;
 
   ngOnInit() {
     this.isLoading = true;
+    this.cdr.detectChanges();
     this.reqService.listForUser().subscribe({
       next: (res: any) => {
         this.isLoading = false;
         this.requests = res.data.content || res.data; 
+        this.cdr.detectChanges();
       },
       error: () => {
         this.isLoading = false;
+        this.cdr.detectChanges();
         this.toast.error('Failed to load premium requests.');
       }
     });
