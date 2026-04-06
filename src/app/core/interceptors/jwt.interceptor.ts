@@ -28,7 +28,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
           isRefreshing = true;
           const refreshToken = localStorage.getItem('refreshToken');
           if (refreshToken) {
-            return authService.refresh({ token: refreshToken }).pipe(
+            return authService.refresh({ refreshToken: refreshToken }).pipe(
               switchMap((res) => {
                 isRefreshing = false;
                 const newToken = res.data?.accessToken;

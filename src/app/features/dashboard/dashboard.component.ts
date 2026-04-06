@@ -7,13 +7,12 @@ import { CvService } from '../../core/services/cv.service';
 import { CoverLetterService } from '../../core/services/cover-letter.service';
 import { OrderService } from '../../core/services/order.service';
 import { User } from '../../core/models/user.model';
-import { LogoComponent } from '../../shared/components/logo/logo.component';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, LogoComponent, NavbarComponent],
+  imports: [CommonModule, RouterModule, NavbarComponent],
   template: `
     <app-navbar></app-navbar>
 

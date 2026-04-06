@@ -4,6 +4,7 @@ import { AdminService } from '../../../core/services/admin.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RequestStatus } from '../../../core/models/premium-request.model';
 
 @Component({
   selector: 'app-admin-premium',
@@ -164,10 +165,11 @@ export class AdminPremiumComponent implements OnInit {
     });
   }
 
-  updateStatus(req: any, status: string) {
+  updateStatus(req: any, status: any) {
+    const requestStatus = status as RequestStatus;
     this.isLoading = true;
     this.cdr.detectChanges();
-    this.adminService.updatePremiumRequestStatus(req.id, { status }).subscribe({
+    this.adminService.updatePremiumRequestStatus(req.id, { status: requestStatus }).subscribe({
       next: () => {
         this.isLoading = false;
         this.cdr.detectChanges();

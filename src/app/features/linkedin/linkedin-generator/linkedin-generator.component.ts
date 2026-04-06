@@ -127,7 +127,7 @@ export class LinkedInGeneratorComponent {
     if (this.linkedinForm.invalid) return;
     this.isLoading = true;
     const payload = {
-      careerSummaryInput: this.linkedinForm.value.currentCvContent
+      careerSummaryInput: this.linkedinForm.get('currentCvContent')?.value || ''
     };
     
     this.linkedInService.generate(payload).subscribe({
