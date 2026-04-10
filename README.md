@@ -1,59 +1,118 @@
-# QueenstouchFrontend
+# Queenstouch — Modern Career Tools Platform (Frontend)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.3.
+✨ **Empowering Professionals with AI-Generated Career Assets.**
 
-## Development server
+Queenstouch is a sleek, modern web application designed to help job seekers build high-impact CVs, Cover Letters, and LinkedIn profiles using the power of Google Gemini AI.
 
-To start a local development server, run:
+---
+
+## 🚀 Features
+
+### 📄 Smart CV Builder
+- **Multi-step Interactive Form**: Seamlessly navigate through personal info, experience, education, and skills.
+- **AI Summary Generator**: Draft a professional summary in seconds based on your target role.
+- **AI Achievement Builder**: Transform basic tasks into high-impact achievements using the XYZ formula.
+- **AI CV Scoring**: Get real-time feedback on your CV strength and impact.
+- **Job Match Analysis**: Compare your CV against a job description to see percentage match and keyword gaps.
+
+### ✉️ AI Cover Letter Generator
+- Generate tailored cover letters for specific job roles and companies.
+- Tone and style adjustments to match the company culture.
+
+### 🔗 LinkedIn Profile Optimizer
+- AI-generated headlines and "About" sections to boost your profile's searchability.
+
+### 💎 Premium Services
+- System for requesting human-expert career coaching and premium CV writing services.
+
+### 🛠 Admin Dashboard
+- Comprehensive management of users, orders, and platform configurations.
+- Real-time statistics and service request tracking.
+
+---
+
+## 💻 Tech Stack
+
+- **Framework**: [Angular 19+](https://angular.dev/) (Modern Standalone Components)
+- **Logic**: TypeScript
+- **Styling**: Vanilla CSS (Modern design system with HSL variables)
+- **State Management**: Reactive RxJS streams
+- **Testing**: [Vitest](https://vitest.dev/) (Fast unit and integration testing)
+- **Environment**: ESM & Vite-driven build process
+
+---
+
+## 🛠 Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (LTS recommended)
+- [npm](https://www.npmjs.com/)
+
+### Installation
+
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/your-repo/queenstouch-frontend.git
+    cd queenstouch-frontend
+    ```
+
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
+
+### Development Server
+
+Run the development server:
+```bash
+npm start
+```
+Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+
+---
+
+## 📂 Project Structure
 
 ```bash
-ng serve
+src/app/
+├── core/                # Core services, guards, and interceptors
+│   ├── guards/          # AuthGuard, AdminGuard
+│   ├── interceptors/    # Token handling
+│   └── services/        # API communication (CvService, AuthService, etc.)
+├── features/            # Feature-based lazy-loaded modules
+│   ├── auth/            # Login, Sign-up, Password Recovery
+│   ├── cv/              # CV Builder & List management
+│   ├── cover-letter/    # AI Cover Letter engine
+│   ├── dashboard/       # User landing area
+│   └── admin/           # Platform management tools
+├── shared/              # Reusable UI components
+│   ├── components/      # Navbar, Toast, Spinner, ScoreRing
+│   └── pipes/           # Formatting utilities
+└── app.css              # Global design system & variable definitions
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## 🧪 Testing
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+Execute unit tests using Vitest:
 ```bash
-ng generate component component-name
+npm test
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
 
-```bash
-ng generate --help
-```
+## 🎨 Design System
 
-## Building
+The project uses a custom design system defined in `src/app/app.css`, using HSL color tokens for:
+- `--qt-navy`: Deep corporate blue
+- `--qt-orange`: Vibrant action color
+- `--qt-bg-secondary`: Soft interface backgrounds
+- Glassmorphism effects and smooth transitions across all interactive elements.
 
-To build the project run:
+---
 
-```bash
-ng build
-```
+## 📝 License
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+This project is licensed under the internal Queenstouch License.
