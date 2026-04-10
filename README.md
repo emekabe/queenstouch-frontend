@@ -115,4 +115,4 @@ The project uses a custom design system defined in `src/app/app.css`, using HSL 
 
 ## 📝 License
 
-This project is licensed under the internal Queenstouch License.
+This project is open-source and free for anyone to contribute to. We welcome community contributions to help improve the platform for job seekers everywhere!
