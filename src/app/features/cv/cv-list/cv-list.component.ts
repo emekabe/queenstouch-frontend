@@ -15,7 +15,7 @@ import { NavbarComponent } from '../../../shared/components/navbar/navbar.compon
     <app-navbar></app-navbar>
     <div class="container py-5 min-vh-100">
       <app-spinner [show]="isLoading"></app-spinner>
-      
+
       <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>My Resumes</h2>
         <a routerLink="/cv/new" class="btn btn-primary">+ Create New CV</a>
@@ -34,8 +34,8 @@ import { NavbarComponent } from '../../../shared/components/navbar/navbar.compon
           <tbody>
             <tr *ngFor="let cv of cvs">
               <td>
-                <div class="fw-500">{{ cv.personalInfo?.targetJobTitle || 'Untitled CV' }}</div>
-                <div class="small text-muted">{{ cv.isDraft ? 'Draft' : 'Completed' }}</div>
+                <div class="fw-500">{{ cv.title || 'Untitled CV' }}</div>
+                <div class="small text-muted">{{ cv.status === 'DRAFT' ? 'Draft' : 'Completed' }}</div>
               </td>
               <td>{{ cv.updatedAt | date:'mediumDate' }}</td>
               <td>
@@ -70,7 +70,7 @@ import { NavbarComponent } from '../../../shared/components/navbar/navbar.compon
     .shadow-sm { box-shadow: var(--box-shadow-sm); }
     .border-none { border: none; }
     .overflow-hidden { overflow: hidden; }
-    
+
     .table { width: 100%; border-collapse: collapse; }
     .table th, .table td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); text-align: left; }
     .table th { font-weight: 600; color: var(--qt-navy); }
@@ -79,7 +79,7 @@ import { NavbarComponent } from '../../../shared/components/navbar/navbar.compon
     .fw-500 { font-weight: 500; }
     .small { font-size: 0.875rem; }
     .me-2 { margin-right: 0.5rem; }
-    
+
     .badge {
       padding: 0.25rem 0.5rem;
       border-radius: 4px;
@@ -89,7 +89,7 @@ import { NavbarComponent } from '../../../shared/components/navbar/navbar.compon
     .badge.green { background-color: rgba(40, 167, 69, 0.1); color: var(--qt-success); }
     .badge.yellow { background-color: rgba(255, 193, 7, 0.1); color: var(--qt-warning); }
     .badge.red { background-color: rgba(220, 53, 69, 0.1); color: var(--qt-danger); }
-    
+
     .btn-outline-secondary { color: var(--qt-navy); border: 1px solid var(--border-color); background: transparent; }
     .btn-outline-secondary:hover { background: var(--qt-bg-secondary); }
     .btn-outline-danger { border: 1px solid transparent; background: transparent; }
