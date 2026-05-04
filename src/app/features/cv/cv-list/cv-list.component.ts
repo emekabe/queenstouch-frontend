@@ -33,69 +33,168 @@ import { CvDocument, ApiResponse } from '../models/cv.interface';
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let cv of cvs">
-              <td>
-                <div class="fw-500">{{ cv.title || 'Untitled CV' }}</div>
-                <div class="small text-muted">{{ cv.status === 'DRAFT' ? 'Draft' : 'Completed' }}</div>
-              </td>
-              <td>{{ cv.updatedAt | date:'mediumDate' }}</td>
-              <td>
-                <span class="badge" [ngClass]="getScoreClass(cv.cvScore?.overall || 0)">{{ cv.cvScore?.overall || 0 }} / 100</span>
-              </td>
-              <td class="text-right">
-                <button class="btn btn-sm btn-outline-primary me-2" (click)="downloadCv(cv.id, 'PDF')">PDF</button>
-                <button class="btn btn-sm btn-outline-primary me-2" (click)="downloadCv(cv.id, 'DOCX')">DOCX</button>
-                <a [routerLink]="['/cv', cv.id]" class="btn btn-sm btn-outline-secondary me-2">Edit</a>
-                <button class="btn btn-sm text-danger btn-outline-danger" (click)="deleteCv(cv.id)">Delete</button>
-              </td>
-            </tr>
-            <tr *ngIf="cvs.length === 0">
-              <td colspan="4" class="text-center py-4 text-muted">You haven't created any CVs yet.</td>
-            </tr>
+            @for (cv of cvs; track cv) {
+              <tr>
+                <td>
+                  <div class="fw-500">{{ cv.title || 'Untitled CV' }}</div>
+                  <div class="small text-muted">
+                    {{ cv.status === 'DRAFT' ? 'Draft' : 'Completed' }}
+                  </div>
+                </td>
+                <td>{{ cv.updatedAt | date: 'mediumDate' }}</td>
+                <td>
+                  <span class="badge" [ngClass]="getScoreClass(cv.cvScore?.overall || 0)"
+                    >{{ cv.cvScore?.overall || 0 }} / 100</span
+                  >
+                </td>
+                <td class="text-right">
+                  <button
+                    class="btn btn-sm btn-outline-primary me-2"
+                    (click)="downloadCv(cv.id, 'PDF')"
+                  >
+                    PDF
+                  </button>
+                  <button
+                    class="btn btn-sm btn-outline-primary me-2"
+                    (click)="downloadCv(cv.id, 'DOCX')"
+                  >
+                    DOCX
+                  </button>
+                  <a [routerLink]="['/cv', cv.id]" class="btn btn-sm btn-outline-secondary me-2"
+                    >Edit</a
+                  >
+                  <button
+                    class="btn btn-sm text-danger btn-outline-danger"
+                    (click)="deleteCv(cv.id)"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            }
+            @if (cvs.length === 0) {
+              <tr>
+                <td colspan="4" class="text-center py-4 text-muted">
+                  You haven't created any CVs yet.
+                </td>
+              </tr>
+            }
           </tbody>
         </table>
       </div>
     </div>
   `,
-  styles: [`
-    .container { max-width: 1000px; margin: 0 auto; }
-    .min-vh-100 { min-height: 100vh; }
-    .py-5 { padding-top: 3rem; padding-bottom: 3rem; }
-    .d-flex { display: flex; }
-    .justify-content-between { justify-content: space-between; }
-    .align-items-center { align-items: center; }
-    .mb-4 { margin-bottom: 1.5rem; }
-    .p-0 { padding: 0 !important; }
-    .mb-0 { margin-bottom: 0 !important; }
-    .py-4 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
-    .shadow-sm { box-shadow: var(--box-shadow-sm); }
-    .border-none { border: none; }
-    .overflow-hidden { overflow: hidden; }
+  styles: [
+    `
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+      }
+      .min-vh-100 {
+        min-height: 100vh;
+      }
+      .py-5 {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+      }
+      .d-flex {
+        display: flex;
+      }
+      .justify-content-between {
+        justify-content: space-between;
+      }
+      .align-items-center {
+        align-items: center;
+      }
+      .mb-4 {
+        margin-bottom: 1.5rem;
+      }
+      .p-0 {
+        padding: 0 !important;
+      }
+      .mb-0 {
+        margin-bottom: 0 !important;
+      }
+      .py-4 {
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
+      }
+      .shadow-sm {
+        box-shadow: var(--box-shadow-sm);
+      }
+      .border-none {
+        border: none;
+      }
+      .overflow-hidden {
+        overflow: hidden;
+      }
 
-    .table { width: 100%; border-collapse: collapse; }
-    .table th, .table td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); text-align: left; }
-    .table th { font-weight: 600; color: var(--qt-navy); }
-    .text-right { text-align: right !important; }
-    .bg-secondary { background-color: var(--qt-bg-secondary); }
-    .fw-500 { font-weight: 500; }
-    .small { font-size: 0.875rem; }
-    .me-2 { margin-right: 0.5rem; }
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .table th,
+      .table td {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        text-align: left;
+      }
+      .table th {
+        font-weight: 600;
+        color: var(--qt-navy);
+      }
+      .text-right {
+        text-align: right !important;
+      }
+      .bg-secondary {
+        background-color: var(--qt-bg-secondary);
+      }
+      .fw-500 {
+        font-weight: 500;
+      }
+      .small {
+        font-size: 0.875rem;
+      }
+      .me-2 {
+        margin-right: 0.5rem;
+      }
 
-    .badge {
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      font-size: 0.875rem;
-      font-weight: 600;
-    }
-    .badge.green { background-color: rgba(40, 167, 69, 0.1); color: var(--qt-success); }
-    .badge.yellow { background-color: rgba(255, 193, 7, 0.1); color: var(--qt-warning); }
-    .badge.red { background-color: rgba(220, 53, 69, 0.1); color: var(--qt-danger); }
+      .badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+      .badge.green {
+        background-color: rgba(40, 167, 69, 0.1);
+        color: var(--qt-success);
+      }
+      .badge.yellow {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: var(--qt-warning);
+      }
+      .badge.red {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: var(--qt-danger);
+      }
 
-    .btn-outline-secondary { color: var(--qt-navy); border: 1px solid var(--border-color); background: transparent; }
-    .btn-outline-secondary:hover { background: var(--qt-bg-secondary); }
-    .btn-outline-danger { border: 1px solid transparent; background: transparent; }
-    .btn-outline-danger:hover { background: rgba(220, 53, 69, 0.1); }
-  `]
+      .btn-outline-secondary {
+        color: var(--qt-navy);
+        border: 1px solid var(--border-color);
+        background: transparent;
+      }
+      .btn-outline-secondary:hover {
+        background: var(--qt-bg-secondary);
+      }
+      .btn-outline-danger {
+        border: 1px solid transparent;
+        background: transparent;
+      }
+      .btn-outline-danger:hover {
+        background: rgba(220, 53, 69, 0.1);
+      }
+    `,
+  ],
 })
 export class CvListComponent implements OnInit {
   cvService = inject(CvService);
@@ -123,7 +222,7 @@ export class CvListComponent implements OnInit {
         this.isLoading = false;
         this.cdr.detectChanges();
         this.toast.error('Error loading CVs');
-      }
+      },
     });
   }
 
@@ -139,7 +238,7 @@ export class CvListComponent implements OnInit {
           this.isLoading = false;
           this.cdr.detectChanges();
           this.toast.error('Failed to delete CV');
-        }
+        },
       });
     }
   }
@@ -168,15 +267,15 @@ export class CvListComponent implements OnInit {
       },
       error: (err) => {
         if (err.status === 402 || err.status === 403) {
-           this.isLoading = false;
-           this.cdr.detectChanges();
-           this.router.navigate(['/orders/checkout', 'cv', id]);
+          this.isLoading = false;
+          this.cdr.detectChanges();
+          this.router.navigate(['/orders/checkout', 'cv', id]);
         } else {
           this.isLoading = false;
           this.cdr.detectChanges();
           this.toast.error('Failed to download CV.');
         }
-      }
+      },
     });
   }
 }

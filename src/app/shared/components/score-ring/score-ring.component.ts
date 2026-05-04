@@ -1,10 +1,9 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-score-ring',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div class="score-ring-wrapper" [style.width.px]="size" [style.height.px]="size">
       <svg [attr.width]="size" [attr.height]="size" viewBox="0 0 100 100">
@@ -30,32 +29,30 @@ import { CommonModule } from '@angular/common';
           [attr.stroke-dashoffset]="strokeDashoffset"
           transform="rotate(-90 50 50)"
         />
-        <text 
-          x="50%" 
-          y="50%" 
-          text-anchor="middle" 
-          dy=".3em" 
-          class="score-text" 
-          [attr.fill]="color">
+        <text x="50%" y="50%" text-anchor="middle" dy=".3em" class="score-text" [attr.fill]="color">
           {{ score }}
         </text>
       </svg>
     </div>
   `,
-  styles: [`
-    .score-ring-wrapper {
-      position: relative;
-      display: inline-block;
-    }
-    .progress-circle {
-      transition: stroke-dashoffset 1s ease-out, stroke 0.3s;
-    }
-    .score-text {
-      font-family: 'Inter', sans-serif;
-      font-weight: 700;
-      font-size: 28px;
-    }
-  `]
+  styles: [
+    `
+      .score-ring-wrapper {
+        position: relative;
+        display: inline-block;
+      }
+      .progress-circle {
+        transition:
+          stroke-dashoffset 1s ease-out,
+          stroke 0.3s;
+      }
+      .score-text {
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 28px;
+      }
+    `,
+  ],
 })
 export class ScoreRingComponent implements OnChanges {
   @Input() score: number = 0; // 0 to 100
@@ -74,7 +71,7 @@ export class ScoreRingComponent implements OnChanges {
   private updateProgress() {
     const validScore = Math.max(0, Math.min(100, this.score));
     const offset = this.circumference - (validScore / 100) * this.circumference;
-    
+
     // Animate offset
     setTimeout(() => {
       this.strokeDashoffset = offset;
