@@ -6,6 +6,7 @@ import { OrderService } from '../../../core/services/order.service';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { ToastService } from '../../../shared/services/toast.service';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
+import { CvDocument, ApiResponse } from '../models/cv.interface';
 
 @Component({
   selector: 'app-cv-list',
@@ -39,7 +40,7 @@ import { NavbarComponent } from '../../../shared/components/navbar/navbar.compon
               </td>
               <td>{{ cv.updatedAt | date:'mediumDate' }}</td>
               <td>
-                <span class="badge" [ngClass]="getScoreClass(cv.score)">{{ cv.score || 0 }} / 100</span>
+                <span class="badge" [ngClass]="getScoreClass(cv.cvScore?.overall || 0)">{{ cv.cvScore?.overall || 0 }} / 100</span>
               </td>
               <td class="text-right">
                 <button class="btn btn-sm btn-outline-primary me-2" (click)="downloadCv(cv.id, 'PDF')">PDF</button>
@@ -102,7 +103,7 @@ export class CvListComponent implements OnInit {
   toast = inject(ToastService);
   router = inject(Router);
   cdr = inject(ChangeDetectorRef);
-  cvs: any[] = [];
+  cvs: CvDocument[] = [];
   isLoading = false;
 
   ngOnInit() {
@@ -115,7 +116,7 @@ export class CvListComponent implements OnInit {
     this.cvService.list().subscribe({
       next: (res) => {
         this.isLoading = false;
-        this.cvs = res.data || [];
+        this.cvs = (res.data as unknown as CvDocument[]) || [];
         this.cdr.detectChanges();
       },
       error: () => {

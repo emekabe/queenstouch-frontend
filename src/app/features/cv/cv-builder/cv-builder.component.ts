@@ -7,6 +7,7 @@ import { ToastService } from '../../../shared/services/toast.service';
 import { SpinnerComponent } from '../../../shared/components/spinner/spinner.component';
 import { ScoreRingComponent } from '../../../shared/components/score-ring/score-ring.component';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
+import { CvDocument, ApiResponse, WorkExperience, Education, Skill, Project, CvScore } from '../models/cv.interface';
 
 @Component({
   selector: 'app-cv-builder',
@@ -460,8 +461,8 @@ export class CvBuilderComponent implements OnInit {
     if (!this.cvId) return;
     this.isLoading = true;
     this.cvService.getById(this.cvId).subscribe({
-      next: (res: any) => {
-        const cv = res.data;
+      next: (res) => {
+        const cv = res.data as unknown as CvDocument;
         this.isLoading = false;
         this.cdr.detectChanges();
         // Patch form
@@ -473,7 +474,7 @@ export class CvBuilderComponent implements OnInit {
         }
         if (cv.workExperiences && Array.isArray(cv.workExperiences)) {
           this.experienceArray.clear();
-          cv.workExperiences.forEach((e: any) => {
+          cv.workExperiences.forEach((e: WorkExperience) => {
             const group = this.fb.group({
               jobTitle: [e.jobTitle || ''],
               company: [e.company || ''],
@@ -487,7 +488,7 @@ export class CvBuilderComponent implements OnInit {
         }
         if (cv.educations && Array.isArray(cv.educations)) {
           this.educationArray.clear();
-          cv.educations.forEach((e: any) => {
+          cv.educations.forEach((e: Education) => {
             this.educationArray.push(this.fb.group({
               institution: [e.institution || ''],
               degree: [e.degree || ''],
@@ -500,7 +501,7 @@ export class CvBuilderComponent implements OnInit {
         }
         if (cv.skills && Array.isArray(cv.skills)) {
           this.skillsArray.clear();
-          cv.skills.forEach((s: any) => {
+          cv.skills.forEach((s: Skill) => {
             this.skillsArray.push(this.fb.group({
               name: [s.name || ''],
               level: [s.level || 'INTERMEDIATE']
@@ -510,7 +511,7 @@ export class CvBuilderComponent implements OnInit {
         // Projects aren't in standard CvModel, but stored in extra data if user uses CV Builder, but we handle it
         if (cv.projects && Array.isArray(cv.projects)) {
           this.projectsArray.clear();
-          cv.projects.forEach((p: any) => {
+          cv.projects.forEach((p: Project) => {
             this.projectsArray.push(this.fb.group({
               title: [p.title || ''],
               link: [p.link || ''],
@@ -615,7 +616,7 @@ export class CvBuilderComponent implements OnInit {
       : this.cvService.create(personalInfoPayload);
       
     obs$.subscribe({
-      next: (res: any) => {
+      next: (res) => {
         this.isLoading = false;
         if (!this.cvId) {
           this.cvId = res.data.id;
@@ -634,7 +635,7 @@ export class CvBuilderComponent implements OnInit {
               current: exp.currentJob,
               bullets: exp.description ? [exp.description] : []
             }));
-            this.cvService.updateSection(this.cvId, 'experience', { workExperiences }).subscribe();
+            this.cvService.updateSection(this.cvId, 'experience', { workExperiences } as any).subscribe();
           }
 
           if (this.currentStep === 4) {
@@ -645,7 +646,7 @@ export class CvBuilderComponent implements OnInit {
               startDate: edu.startDate,
               endDate: edu.endDate
             }));
-            this.cvService.updateSection(this.cvId, 'education', { educations }).subscribe();
+            this.cvService.updateSection(this.cvId, 'education', { educations } as any).subscribe();
           }
 
           if (this.currentStep === 5) {
@@ -653,7 +654,7 @@ export class CvBuilderComponent implements OnInit {
               name: s.name,
               level: s.level
             }));
-            this.cvService.updateSection(this.cvId, 'skills', { skills }).subscribe();
+            this.cvService.updateSection(this.cvId, 'skills', { skills } as any).subscribe();
           }
         }
 
@@ -695,7 +696,7 @@ export class CvBuilderComponent implements OnInit {
       };
       
       this.cvService.generateSummary(this.cvId!, payload).subscribe({
-        next: (res: any) => {
+        next: (res) => {
           this.isLoading = false;
           this.cvForm.get('professionalSummary')?.setValue(res.data.summary);
           this.toast.success('Summary generated via AI.');
@@ -723,7 +724,7 @@ export class CvBuilderComponent implements OnInit {
       task: control.value,
       result: 'Significant impact' // Placeholder
     }).subscribe({
-      next: (res: any) => {
+      next: (res) => {
         this.isLoading = false;
         control.setValue(res.data.bullet);
         this.toast.success('Achievement improved via AI.');
@@ -741,9 +742,9 @@ export class CvBuilderComponent implements OnInit {
     this.saveDraft(() => {
       this.isLoading = true;
       this.cvService.scoreCv(this.cvId!).subscribe({
-        next: (res: any) => {
+        next: (res) => {
           this.isLoading = false;
-          this.cvScore = res.data.overall;
+          this.cvScore = res.data.overall || 0;
           this.toast.success('CV successfully analyzed!');
           this.cdr.detectChanges();
         },
