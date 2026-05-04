@@ -32,6 +32,10 @@ export class CvService {
     return this.http.get<ApiResponse<CvDocument>>(`${this.baseUrl}/${id}`);
   }
 
+  update(id: string, data: UpdateCvRequest): Observable<ApiResponse<CvDocument>> {
+    return this.http.put<ApiResponse<CvDocument>>(`${this.baseUrl}/${id}`, data);
+  }
+
   updateSection(id: string, section: string, data: UpdateCvRequest): Observable<ApiResponse<CvDocument>> {
     return this.http.patch<ApiResponse<CvDocument>>(`${this.baseUrl}/${id}/${section}`, data);
   }

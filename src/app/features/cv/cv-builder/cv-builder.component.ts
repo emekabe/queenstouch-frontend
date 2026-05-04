@@ -707,11 +707,26 @@ export class CvBuilderComponent implements OnInit {
         this.isLoading = false;
         this.cdr.detectChanges();
         // Patch form
-        if (cv.personalInfo) {
-          this.cvForm.get('personalInfo')?.patchValue(cv.personalInfo);
+        let firstName = '';
+        let lastName = '';
+        if (cv.fullName) {
+          const nameParts = cv.fullName.split(' ');
+          firstName = nameParts[0] || '';
+          lastName = nameParts.slice(1).join(' ') || '';
         }
-        if (cv.professionalSummary) {
-          this.cvForm.get('professionalSummary')?.patchValue(cv.professionalSummary);
+
+        this.cvForm.get('personalInfo')?.patchValue({
+          firstName: firstName,
+          lastName: lastName,
+          email: cv.email || '',
+          phone: cv.phone || '',
+          linkedin: cv.linkedinUrl || '',
+          portfolio: cv.portfolioUrl || '',
+          targetJobTitle: cv.title || ''
+        });
+
+        if (cv.summary) {
+          this.cvForm.get('professionalSummary')?.patchValue(cv.summary);
         }
         if (cv.workExperiences && Array.isArray(cv.workExperiences)) {
           this.experienceArray.clear();
@@ -851,22 +866,49 @@ export class CvBuilderComponent implements OnInit {
     this.isLoading = true;
     const v = this.cvForm.value;
 
-    // 1. Map Personal Info
-    const personalInfoPayload: any = {
-      fullName: `${v.personalInfo.firstName} ${v.personalInfo.lastName}`.trim(),
-      email: v.personalInfo.email,
-      phone: v.personalInfo.phone,
-      linkedinUrl: v.personalInfo.linkedin,
-      portfolioUrl: v.personalInfo.portfolio,
-      title: v.personalInfo.targetJobTitle,
+    const payload: any = {
+      fullName: `${v.personalInfo?.firstName || ''} ${v.personalInfo?.lastName || ''}`.trim(),
+      email: v.personalInfo?.email,
+      phone: v.personalInfo?.phone,
+      linkedinUrl: v.personalInfo?.linkedin,
+      portfolioUrl: v.personalInfo?.portfolio,
+      title: v.personalInfo?.targetJobTitle,
       summary: v.professionalSummary,
-      cvType: 'STANDARD', // Default for this builder
+      cvType: 'STANDARD',
       scholarshipMode: false,
     };
 
+    if (this.currentStep >= 3) {
+      payload.workExperiences = (v.experience || []).map((exp: any) => ({
+        jobTitle: exp.jobTitle,
+        company: exp.company,
+        startDate: exp.startDate,
+        endDate: exp.endDate,
+        current: exp.current,
+        bullets: exp.description ? [exp.description] : [],
+      }));
+    }
+
+    if (this.currentStep >= 4) {
+      payload.educations = (v.education || []).map((edu: any) => ({
+        institution: edu.institution,
+        degree: edu.degree,
+        fieldOfStudy: edu.fieldOfStudy,
+        startDate: edu.startDate,
+        endDate: edu.endDate,
+      }));
+    }
+
+    if (this.currentStep >= 5) {
+      payload.skills = (v.skills || []).map((s: any) => ({
+        name: s.name,
+        level: s.level,
+      }));
+    }
+
     const obs$ = this.cvId
-      ? this.cvService.updateSection(this.cvId, 'personal-info', personalInfoPayload)
-      : this.cvService.create(personalInfoPayload);
+      ? this.cvService.update(this.cvId, payload)
+      : this.cvService.create(payload);
 
     obs$.subscribe({
       next: (res) => {
@@ -876,42 +918,6 @@ export class CvBuilderComponent implements OnInit {
           this.cvForm.get('id')?.setValue(this.cvId);
         }
         this.cdr.detectChanges();
-
-        // 2. Map other sections if they exist and we are beyond step 1
-        if (this.cvId) {
-          if (this.currentStep === 3) {
-            const workExperiences = v.experience.map((exp: any) => ({
-              jobTitle: exp.jobTitle,
-              company: exp.company,
-              startDate: exp.startDate,
-              endDate: exp.endDate,
-              current: exp.currentJob,
-              bullets: exp.description ? [exp.description] : [],
-            }));
-            this.cvService
-              .updateSection(this.cvId, 'experience', { workExperiences } as any)
-              .subscribe();
-          }
-
-          if (this.currentStep === 4) {
-            const educations = v.education.map((edu: any) => ({
-              institution: edu.institution,
-              degree: edu.degree,
-              fieldOfStudy: edu.fieldOfStudy,
-              startDate: edu.startDate,
-              endDate: edu.endDate,
-            }));
-            this.cvService.updateSection(this.cvId, 'education', { educations } as any).subscribe();
-          }
-
-          if (this.currentStep === 5) {
-            const skills = v.skills.map((s: any) => ({
-              name: s.name,
-              level: s.level,
-            }));
-            this.cvService.updateSection(this.cvId, 'skills', { skills } as any).subscribe();
-          }
-        }
 
         if (onSuccess) {
           this.toast.success('Auto-saved as draft before processing.');
