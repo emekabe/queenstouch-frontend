@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
@@ -10,7 +10,7 @@ import { SpinnerComponent } from '../../../shared/components/spinner/spinner.com
 @Component({
   selector: 'app-verify',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, LogoComponent, SpinnerComponent],
+  imports: [ReactiveFormsModule, RouterModule, LogoComponent, SpinnerComponent],
   template: `
     <div class="auth-layout">
       <app-spinner [show]="isLoading"></app-spinner>
@@ -31,42 +31,57 @@ import { SpinnerComponent } from '../../../shared/components/spinner/spinner.com
               class="form-control text-center code-input"
               formControlName="code"
               placeholder="000000"
-              maxlength="6">
+              maxlength="6"
+            />
           </div>
 
-          <button type="submit" class="btn btn-primary w-100 mt-4" [disabled]="verifyForm.invalid || isLoading">
+          <button
+            type="submit"
+            class="btn btn-primary w-100 mt-4"
+            [disabled]="verifyForm.invalid || isLoading"
+          >
             Verify Code
           </button>
         </form>
 
         <div class="text-center mt-4">
-          <p>Didn't receive a code? <a href="javascript:void(0)" (click)="resendCode()">Resend</a></p>
-          <p class="mt-2 text-muted" style="font-size: 14px;"><a routerLink="/auth/login">Back to Login</a></p>
+          <p>
+            Didn't receive a code? <a href="javascript:void(0)" (click)="resendCode()">Resend</a>
+          </p>
+          <p class="mt-2 text-muted" style="font-size: 14px;">
+            <a routerLink="/auth/login">Back to Login</a>
+          </p>
         </div>
       </div>
     </div>
   `,
-  styles: [`
-    .auth-layout {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      background-color: var(--qt-bg-secondary);
-    }
-    .auth-card {
-      width: 100%;
-      max-width: 450px;
-      padding: 2rem;
-    }
-    .w-100 { width: 100%; }
-    .d-none { display: none; }
-    .code-input {
-      font-size: 24px;
-      letter-spacing: 8px;
-    }
-  `]
+  styles: [
+    `
+      .auth-layout {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background-color: var(--qt-bg-secondary);
+      }
+      .auth-card {
+        width: 100%;
+        max-width: 450px;
+        padding: 2rem;
+      }
+      .w-100 {
+        width: 100%;
+      }
+      .d-none {
+        display: none;
+      }
+      .code-input {
+        font-size: 24px;
+        letter-spacing: 8px;
+      }
+    `,
+  ],
 })
 export class VerifyComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -79,11 +94,11 @@ export class VerifyComponent implements OnInit {
   email = '';
 
   verifyForm = this.fb.group({
-    code: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]]
+    code: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]],
   });
 
   ngOnInit() {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe((params) => {
       if (params['email']) {
         this.email = params['email'];
       }
@@ -108,7 +123,7 @@ export class VerifyComponent implements OnInit {
       error: (err) => {
         this.isLoading = false;
         this.toast.error(err.error?.message || 'Verification failed. Invalid code.');
-      }
+      },
     });
   }
 
