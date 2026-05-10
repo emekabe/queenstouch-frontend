@@ -14,6 +14,10 @@ export const ORDER_ROUTES: Routes = [
     loadComponent: () => import('./checkout/checkout.component').then(c => c.CheckoutComponent)
   },
   {
+    path: 'callback',
+    loadComponent: () => import('./payment-callback/payment-callback.component').then(c => c.PaymentCallbackComponent)
+  },
+  {
     path: '',
     redirectTo: 'pricing',
     pathMatch: 'full'
