@@ -25,6 +25,10 @@ Queenstouch is a sleek, modern web application designed to help job seekers buil
 ### 💎 Premium Services
 - System for requesting human-expert career coaching and premium CV writing services.
 
+### 💳 Secure Payments
+- **Paystack Integration**: Secure external checkout redirections via Paystack.
+- **Automated Fulfillment**: Callback validation and real-time frontend fulfillment for instant document access post-purchase.
+
 ### 🛠 Admin Dashboard
 - Comprehensive management of users, orders, and platform configurations.
 - Real-time statistics and service request tracking.
