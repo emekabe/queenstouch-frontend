@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { OrderService } from '../../../core/services/order.service';
 import { ToastService } from '../../../shared/services/toast.service';
 import { NavbarComponent } from '../../../shared/components/navbar/navbar.component';
@@ -28,27 +28,28 @@ import { NairaPipe } from '../../../shared/pipes/naira.pipe';
               <h2 class="mt-3 mb-4 text-orange">{{ item.minPrice || item.price | naira }}</h2>
               <ul class="text-start mb-4">
                 @if (
-                  item.serviceType === 'STANDARD_CV_DOWNLOAD' ||
-                  item.serviceType === 'ACADEMIC_CV_DOWNLOAD'
+                  item.serviceKey === 'STANDARD_CV' ||
+                  item.serviceKey === 'ACADEMIC_CV'
                 ) {
                   <li>Download perfectly formatted ATS-optimized PDF</li>
                 }
-                @if (item.serviceType === 'COVER_LETTER_DOWNLOAD') {
+                @if (item.serviceKey === 'COVER_LETTER') {
                   <li>Download AI-generated, tailored Cover Letter</li>
                 }
-                @if (item.serviceType === 'EXPERT_REVIEW') {
-                  <li>Get our professionals to review and perfect your CV</li>
-                }
-                @if (item.serviceType === 'CV_BUNDLE') {
-                  <li>Download both Standard and Academic CVs at a discount</li>
-                }
               </ul>
-              <button class="btn btn-outline-primary mt-auto" (click)="placeOrder(item)">
-                Order Now
+              <button class="btn btn-outline-primary mt-auto" (click)="goToBuilder(item)">
+                Get Started
               </button>
             </div>
           }
         </div>
+
+        <p class="text-muted mt-5 small">
+          To purchase a document download, first create your document in the
+          <a routerLink="/cv">CV Builder</a> or
+          <a routerLink="/cover-letter">Cover Letter Builder</a>,
+          then click the download button from your document.
+        </p>
       </div>
     </div>
   `,
@@ -78,6 +79,9 @@ import { NairaPipe } from '../../../shared/pipes/naira.pipe';
       }
       .mt-3 {
         margin-top: 1rem;
+      }
+      .mt-5 {
+        margin-top: 3rem;
       }
       .mt-auto {
         margin-top: auto;
@@ -113,6 +117,7 @@ import { NairaPipe } from '../../../shared/pipes/naira.pipe';
 export class PricingComponent implements OnInit {
   orderService = inject(OrderService);
   toast = inject(ToastService);
+  router = inject(Router);
   cdr = inject(ChangeDetectorRef);
 
   isLoading = true;
@@ -128,9 +133,9 @@ export class PricingComponent implements OnInit {
           this.pricingList = data;
         } else if (data) {
           this.pricingList = Object.keys(data).map((key) => ({
-            serviceType: (data[key] as any).serviceKey || key,
+            serviceKey: (data[key] as any).serviceKey || key,
             label: (data[key] as any).label || key,
-            price: (data[key] as any).minPrice || data[key],
+            minPrice: (data[key] as any).minPrice || data[key],
           }));
         }
         this.isLoading = false;
@@ -144,22 +149,19 @@ export class PricingComponent implements OnInit {
     });
   }
 
-  placeOrder(item: any) {
-    this.isLoading = true;
-    this.cdr.detectChanges();
-    this.orderService
-      .createOrder({ serviceKeys: [item.serviceKey || item.serviceType] })
-      .subscribe({
-        next: () => {
-          this.isLoading = false;
-          this.cdr.detectChanges();
-          // In our mock backend, order is immediately marked as PAID
-          this.toast.success(`Purchased ${item.serviceType} successfully!`);
-        },
-        error: () => {
-          this.isLoading = false;
-          this.toast.error('Failed to place order.');
-        },
-      });
+  /**
+   * The checkout flow requires a specific document ID.
+   * Route the user to the appropriate builder so they can create
+   * a document first, then download (and pay) from there.
+   */
+  goToBuilder(item: any) {
+    const key: string = item.serviceKey || '';
+    if (key === 'COVER_LETTER') {
+      this.router.navigate(['/cover-letter']);
+    } else {
+      // STANDARD_CV, ACADEMIC_CV, or anything CV-related
+      this.router.navigate(['/cv']);
+    }
   }
 }
+
