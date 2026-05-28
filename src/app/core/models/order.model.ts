@@ -22,3 +22,9 @@ export interface Order {
   paidAt?: string;
   createdAt: string;
 }
+
+export interface CreateOrderResponse {
+  order: Order;
+  paymentUrl: string;
+  accessCode: string;
+}

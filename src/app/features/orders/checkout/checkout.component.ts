@@ -184,18 +184,21 @@ export class CheckoutComponent implements OnInit {
         relatedDocumentType: this.documentType,
       })
       .subscribe({
-        next: () => {
-          this.isLoading = false;
-          this.cdr.detectChanges();
-          this.toast.success('Purchase successful! Downloading document...');
-
-          // Redirect back to CV list or CL list and trigger download will be handled there
-          this.router.navigate([this.documentType === 'CV' ? '/cv' : '/cover-letters']);
+        next: (res) => {
+          this.toast.success('Redirecting to secure payment gateway...');
+          // Redirect to Paystack
+          if (res.data?.paymentUrl) {
+            window.location.href = res.data.paymentUrl;
+          } else {
+            this.isLoading = false;
+            this.cdr.detectChanges();
+            this.toast.error('Payment URL not received. Please try again.');
+          }
         },
         error: () => {
           this.isLoading = false;
           this.cdr.detectChanges();
-          this.toast.error('Failed to complete purchase. Please try again.');
+          this.toast.error('Failed to initiate purchase. Please try again.');
         },
       });
   }
